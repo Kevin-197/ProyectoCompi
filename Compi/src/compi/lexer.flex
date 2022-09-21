@@ -31,15 +31,39 @@ typedef | union | unsigned | void | volatile | while {lexeme=yytext(); return Re
 
 "," | ";" | "++" | "--" | "==" | ">=" | ">" | "?" | "<=" | "<" | "!=" | "||" | "&&" | "!" | "=" | 
 "+"| "-" | "*" | "/" | "%" | "(" | ")" | "[" | "]" | "{" | "}" | ":" | "." | "+=" | "-=" | "*=" | 
-"/=" | "&" | "^" | "|" | ">>" | "<<" | "~" | "%=" | "&=" | "^=" | "|=" | "<<=" | ">>=" | "->" {return Operador;}
+"/=" | "&" | "^" | "|" | ">>" | "<<" | "~" | "%=" | "&=" | "^=" | "|=" | "<<=" | ">>=" | "->" {lexeme=yytext(); return Operador;}
 
-"_" {return ERROR;}
+"_" {lexeme=yytext(); return ERROR;}
+
+0({O})+ {lexeme=yytext(); return Octal;}
+0({O})+("u"|"U") {lexeme=yytext(); return OctalU;}
+0({O})+("l"|"L") {lexeme=yytext(); return OctalL;}
+0({O})+("ll"|"LL") {lexeme=yytext(); return OctalLL;}
+0({O})+("ul"|"UL") {lexeme=yytext(); return OctalUL;}
+0({O})+("ull"|"ULL") {lexeme=yytext(); return OctalULL;}
+
+0x({Hl}|{N})+ {lexeme=yytext(); return Hexadecimal;}
+0x({Hl}|{N})+("u"|"U") {lexeme=yytext(); return HexadecimalU;}
+0x({Hl}|{N})+("l"|"L") {lexeme=yytext(); return HexadecimalL;}
+0x({Hl}|{N})+("ll"|"LL") {lexeme=yytext(); return HexadecimalLL;}
+0x({Hl}|{N})+("ul"|"UL") {lexeme=yytext(); return HexadecimalUL;}
+0x({Hl}|{N})+("uLL"|"ULL") {lexeme=yytext(); return HexadecimalULL;}
+
+{N}+ {lexeme=yytext(); return Int;}
+{N}+("u"|"U") {lexeme=yytext(); return IntU;}
+{N}+("l"|"L") {lexeme=yytext(); return IntL;}
+{N}+("ll"|"LL") {lexeme=yytext(); return IntLL;}
+{N}+("ul"|"UL") {lexeme=yytext(); return IntUL;}
+{N}+("ull"|"ULL") {lexeme=yytext(); return IntULL;}
+
+{F}+ {lexeme=yytext(); return Double;}
+{F}+("f"|"F") {lexeme=yytext(); return Float;}
+{F}+("l"|"L") {lexeme=yytext(); return DoubleL;}
+
+(([0-9]*\.[0-9]+)|{N}+)("e"|"E")("-"{N}+|{N}+) {lexeme=yytext(); return PuntoFlotante;}
 
 {L}({L}|{N})* {lexeme=yytext(); return Identificador;}
 
-0({O})+ {lexeme=yytext(); return Octal;}
-0x({Hl}|{N})+ {lexeme=yytext(); return Hexadecimal;}
+{char}|{string}+ {lexeme=yytext(); return Literal;}
 
-{char}|{string}|{F}|{N}+ {lexeme=yytext(); return Literal;}
-
- . {return ERROR;}
+ . {lexeme=yytext(); return ERROR;}

@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.util.Scanner;
 
 /**
  *
@@ -17,8 +18,6 @@ import java.io.Reader;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        long año = 1234534534;
-        System.out.println(año);
         String ruta = "D:/NetBeansProjects/Compi/src/compi/lexer.flex";
         generarLexer(ruta);
         probarLexer();
@@ -33,7 +32,7 @@ public class Main {
         PrintWriter escribir;
         try {
             escribir = new PrintWriter(archivo);
-            escribir.print("a&o");
+            escribir.print("");
             escribir.close();
         } catch (FileNotFoundException ex) {
             System.out.println("a");
@@ -52,13 +51,10 @@ public class Main {
                 }
                 switch (tokens) {
                     case ERROR:
-                        resultado += "Simbolo no definido\n";
-                        break;
-                    case Identificador: case Literal: case Reservada: case Octal: case Hexadecimal:
-                        resultado += lexer.lexeme + ": Es un " + tokens + "\n";
+                        resultado += "Simbolo no definido: "+ lexer.lexeme +"\n";
                         break;
                     default:
-                        resultado += "Token: " + tokens + "\n";
+                        resultado += lexer.lexeme + ": Es un " + tokens + "\n";
                         break;
                 }
             }
