@@ -35,5 +35,6 @@ public enum Tokens {
     DoubleL,
     Float,
     PuntoFlotante,
+    Comment,
     ERROR
 }

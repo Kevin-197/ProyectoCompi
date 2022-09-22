@@ -4,6 +4,12 @@ import static compi.Tokens.*;
 %%
 %class Lexer
 %type Tokens
+%line
+%{
+    public int GetLine() { return yyline + 1; }
+    // ...
+
+%}
 
 L=[a-zA-Z_]+
 N=[0-9]+
@@ -27,7 +33,7 @@ typedef | union | unsigned | void | volatile | while {lexeme=yytext(); return Re
 
 {espacio} {/*Ignore*/}
 
-{multilinecommen} | {comment} {/*Ignore*/}
+{multilinecommen} | {comment} {lexeme=yytext(); return Comment;}
 
 "," | ";" | "++" | "--" | "==" | ">=" | ">" | "?" | "<=" | "<" | "!=" | "||" | "&&" | "!" | "=" | 
 "+"| "-" | "*" | "/" | "%" | "(" | ")" | "[" | "]" | "{" | "}" | ":" | "." | "+=" | "-=" | "*=" | 

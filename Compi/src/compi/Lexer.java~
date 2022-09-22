@@ -57,13 +57,13 @@ class Lexer {
   private static final String ZZ_ACTION_PACKED_0 =
     "\1\0\1\1\1\2\1\3\1\4\1\5\2\4\2\1"+
     "\17\2\7\4\1\1\1\3\1\0\1\6\1\0\1\7"+
-    "\1\6\1\7\1\0\1\5\2\0\1\10\1\0\1\10"+
-    "\17\2\2\11\6\2\1\12\1\0\1\13\1\14\1\15"+
-    "\1\0\1\16\1\14\1\0\30\2\1\17\1\20\1\17"+
-    "\1\20\1\21\1\13\1\22\1\23\1\24\1\5\16\2"+
-    "\1\25\1\26\1\25\1\27\1\30\1\27\1\30\1\0"+
-    "\7\2\1\31\1\32\1\0\1\33\1\32\1\13\2\2"+
-    "\1\34\1\13";
+    "\1\6\1\7\1\0\1\10\2\0\1\11\1\0\1\11"+
+    "\17\2\2\12\6\2\1\13\1\0\1\14\1\15\1\16"+
+    "\1\0\1\17\1\15\1\0\30\2\1\20\1\21\1\20"+
+    "\1\21\1\22\1\14\1\23\1\24\1\25\1\10\16\2"+
+    "\1\26\1\27\1\26\1\30\1\31\1\30\1\31\1\0"+
+    "\7\2\1\32\1\33\1\0\1\34\1\33\1\14\2\2"+
+    "\1\35\1\14";
 
   private static int [] zzUnpackAction() {
     int [] result = new int[152];
@@ -408,6 +408,9 @@ class Lexer {
   private int zzFinalHighSurrogate = 0;
 
   /* user code: */
+    public int GetLine() { return yyline + 1; }
+    // ...
+
     public String lexeme;
 
 
@@ -659,6 +662,58 @@ class Lexer {
     while (true) {
       zzMarkedPosL = zzMarkedPos;
 
+      boolean zzR = false;
+      int zzCh;
+      int zzCharCount;
+      for (zzCurrentPosL = zzStartRead  ;
+           zzCurrentPosL < zzMarkedPosL ;
+           zzCurrentPosL += zzCharCount ) {
+        zzCh = Character.codePointAt(zzBufferL, zzCurrentPosL, zzMarkedPosL);
+        zzCharCount = Character.charCount(zzCh);
+        switch (zzCh) {
+        case '\u000B':
+        case '\u000C':
+        case '\u0085':
+        case '\u2028':
+        case '\u2029':
+          yyline++;
+          zzR = false;
+          break;
+        case '\r':
+          yyline++;
+          zzR = true;
+          break;
+        case '\n':
+          if (zzR)
+            zzR = false;
+          else {
+            yyline++;
+          }
+          break;
+        default:
+          zzR = false;
+        }
+      }
+
+      if (zzR) {
+        // peek one character ahead if it is \n (if we have counted one line too much)
+        boolean zzPeek;
+        if (zzMarkedPosL < zzEndReadL)
+          zzPeek = zzBufferL[zzMarkedPosL] == '\n';
+        else if (zzAtEOF)
+          zzPeek = false;
+        else {
+          boolean eof = zzRefill();
+          zzEndReadL = zzEndRead;
+          zzMarkedPosL = zzMarkedPos;
+          zzBufferL = zzBuffer;
+          if (eof) 
+            zzPeek = false;
+          else 
+            zzPeek = zzBufferL[zzMarkedPosL] == '\n';
+        }
+        if (zzPeek) yyline--;
+      }
       zzAction = -1;
 
       zzCurrentPosL = zzCurrentPos = zzStartRead = zzMarkedPosL;
@@ -728,115 +783,119 @@ class Lexer {
           case 1: 
             { lexeme=yytext(); return ERROR;
             }
-          case 29: break;
+          case 30: break;
           case 2: 
             { lexeme=yytext(); return Identificador;
             }
-          case 30: break;
+          case 31: break;
           case 3: 
             { lexeme=yytext(); return Int;
             }
-          case 31: break;
+          case 32: break;
           case 4: 
             { lexeme=yytext(); return Operador;
             }
-          case 32: break;
+          case 33: break;
           case 5: 
             { /*Ignore*/
             }
-          case 33: break;
+          case 34: break;
           case 6: 
             { lexeme=yytext(); return IntU;
             }
-          case 34: break;
+          case 35: break;
           case 7: 
             { lexeme=yytext(); return IntL;
             }
-          case 35: break;
-          case 8: 
-            { lexeme=yytext(); return Literal;
-            }
           case 36: break;
-          case 9: 
-            { lexeme=yytext(); return Reservada;
+          case 8: 
+            { lexeme=yytext(); return Comment;
             }
           case 37: break;
-          case 10: 
-            { lexeme=yytext(); return Octal;
+          case 9: 
+            { lexeme=yytext(); return Literal;
             }
           case 38: break;
-          case 11: 
-            { lexeme=yytext(); return Double;
+          case 10: 
+            { lexeme=yytext(); return Reservada;
             }
           case 39: break;
-          case 12: 
-            { lexeme=yytext(); return IntUL;
+          case 11: 
+            { lexeme=yytext(); return Octal;
             }
           case 40: break;
-          case 13: 
-            { lexeme=yytext(); return PuntoFlotante;
+          case 12: 
+            { lexeme=yytext(); return Double;
             }
           case 41: break;
-          case 14: 
-            { lexeme=yytext(); return IntLL;
+          case 13: 
+            { lexeme=yytext(); return IntUL;
             }
           case 42: break;
-          case 15: 
-            { lexeme=yytext(); return OctalU;
+          case 14: 
+            { lexeme=yytext(); return PuntoFlotante;
             }
           case 43: break;
-          case 16: 
-            { lexeme=yytext(); return OctalL;
+          case 15: 
+            { lexeme=yytext(); return IntLL;
             }
           case 44: break;
-          case 17: 
-            { lexeme=yytext(); return Hexadecimal;
+          case 16: 
+            { lexeme=yytext(); return OctalU;
             }
           case 45: break;
-          case 18: 
-            { lexeme=yytext(); return Float;
+          case 17: 
+            { lexeme=yytext(); return OctalL;
             }
           case 46: break;
-          case 19: 
-            { lexeme=yytext(); return DoubleL;
+          case 18: 
+            { lexeme=yytext(); return Hexadecimal;
             }
           case 47: break;
-          case 20: 
-            { lexeme=yytext(); return IntULL;
+          case 19: 
+            { lexeme=yytext(); return Float;
             }
           case 48: break;
-          case 21: 
-            { lexeme=yytext(); return OctalUL;
+          case 20: 
+            { lexeme=yytext(); return DoubleL;
             }
           case 49: break;
-          case 22: 
-            { lexeme=yytext(); return OctalLL;
+          case 21: 
+            { lexeme=yytext(); return IntULL;
             }
           case 50: break;
-          case 23: 
-            { lexeme=yytext(); return HexadecimalU;
+          case 22: 
+            { lexeme=yytext(); return OctalUL;
             }
           case 51: break;
-          case 24: 
-            { lexeme=yytext(); return HexadecimalL;
+          case 23: 
+            { lexeme=yytext(); return OctalLL;
             }
           case 52: break;
-          case 25: 
-            { lexeme=yytext(); return OctalULL;
+          case 24: 
+            { lexeme=yytext(); return HexadecimalU;
             }
           case 53: break;
-          case 26: 
-            { lexeme=yytext(); return HexadecimalUL;
+          case 25: 
+            { lexeme=yytext(); return HexadecimalL;
             }
           case 54: break;
-          case 27: 
-            { lexeme=yytext(); return HexadecimalLL;
+          case 26: 
+            { lexeme=yytext(); return OctalULL;
             }
           case 55: break;
-          case 28: 
-            { lexeme=yytext(); return HexadecimalULL;
+          case 27: 
+            { lexeme=yytext(); return HexadecimalUL;
             }
           case 56: break;
+          case 28: 
+            { lexeme=yytext(); return HexadecimalLL;
+            }
+          case 57: break;
+          case 29: 
+            { lexeme=yytext(); return HexadecimalULL;
+            }
+          case 58: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

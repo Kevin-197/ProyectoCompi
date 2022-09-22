@@ -28,18 +28,18 @@ public class Main {
     }
     
     public static void probarLexer() throws IOException{
-        File archivo = new File("archivo.txt");
-        PrintWriter escribir;
-        try {
-            escribir = new PrintWriter(archivo);
-            escribir.print("");
-            escribir.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("a");
-        }
+//        File archivo = new File("archivo.txt");
+//        PrintWriter escribir;
+//        try {
+//            escribir = new PrintWriter(archivo);
+//            escribir.print(" as /*ads\nad*/ \n adad");
+//            escribir.close();
+//        } catch (FileNotFoundException ex) {
+//            System.out.println("a");
+//        }
         
         try {
-            Reader lector = new BufferedReader(new FileReader("archivo.txt"));
+            Reader lector = new BufferedReader(new FileReader("D:\\NetBeansProjects\\Compi\\src\\compi\\archivo.cpp"));
             Lexer lexer = new Lexer(lector);
             String resultado = "";
             while (true) {
@@ -51,10 +51,10 @@ public class Main {
                 }
                 switch (tokens) {
                     case ERROR:
-                        resultado += "Simbolo no definido: "+ lexer.lexeme +"\n";
+                        resultado += "Simbolo no definido: "+ lexer.lexeme +" en la linea "+lexer.GetLine()+"\n";
                         break;
                     default:
-                        resultado += lexer.lexeme + ": Es un " + tokens + "\n";
+                        resultado += lexer.lexeme + ": Es un " + tokens + " en la linea "+lexer.GetLine()+"\n";
                         break;
                 }
             }
