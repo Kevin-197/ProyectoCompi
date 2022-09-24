@@ -1,1 +1,2 @@
-Simbolo no definido: # en la linea 2
+Token    |      Tipo de Error    |     Linea
+#    |      Simbolo no definido    |      2 

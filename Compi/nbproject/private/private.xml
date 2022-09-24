@@ -3,11 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/NetBeansProjects/Compi/src/compi/Tokens.java</file>
-            <file>file:/D:/NetBeansProjects/Compi/src/compi/Lexer.java</file>
-            <file>file:/D:/NetBeansProjects/Compi/src/compi/lexer.flex</file>
-            <file>file:/D:/NetBeansProjects/Compi/src/compi/archivo.cpp</file>
-            <file>file:/D:/NetBeansProjects/Compi/src/compi/Main.java</file>
+            <file>file:/C:/Users/jenar/OneDrive/Documentos/Compi/scanner/ProyectoCompi/Compi/src/compi/archivo.cpp</file>
+            <file>file:/C:/Users/jenar/OneDrive/Documentos/Compi/scanner/ProyectoCompi/Compi/src/compi/Errores.txt</file>
+            <file>file:/C:/Users/jenar/OneDrive/Documentos/Compi/scanner/ProyectoCompi/Compi/src/compi/lexer.flex</file>
+            <file>file:/C:/Users/jenar/OneDrive/Documentos/Compi/scanner/ProyectoCompi/Compi/src/compi/Tokens.java</file>
+            <file>file:/C:/Users/jenar/OneDrive/Documentos/Compi/scanner/ProyectoCompi/Compi/src/compi/Main.java</file>
+            <file>file:/C:/Users/jenar/OneDrive/Documentos/Compi/scanner/ProyectoCompi/Compi/src/compi/Lexer.java</file>
+            <file>file:/C:/Users/jenar/OneDrive/Documentos/Compi/scanner/ProyectoCompi/Compi/src/compi/Tokens.txt</file>
         </group>
     </open-files>
 </project-private>
