@@ -9,11 +9,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.LinkedHashMap;
 
 /**
  *
@@ -21,46 +19,32 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        String ruta = "C:\\Users\\jenar\\OneDrive\\Documentos\\Compi\\scanner\\ProyectoCompi\\Compi\\src\\compi\\lexer.flex";
+        String ruta = "D:\\NetBeansProjects\\Compi\\src\\compi\\lexer.flex";
         generarLexer(ruta);
         probarLexer();
     }
+    
     public static void generarLexer(String ruta){
         File archivo = new File(ruta);
         jflex.Main.generate(archivo);
     }
     
     public static void probarLexer() throws IOException{
-//        File archivo = new File("archivo.txt");
-//        PrintWriter escribir;
-//        try {
-//            escribir = new PrintWriter(archivo);
-//            escribir.print(" as /*ads\nad*/ \n adad");
-//            escribir.close();
-//        } catch (FileNotFoundException ex) {
-//            System.out.println("a");
-//        }
         try {
-            Reader lector = new BufferedReader(new FileReader("C:\\Users\\jenar\\OneDrive\\Documentos\\Compi\\scanner\\ProyectoCompi\\Compi\\src\\compi\\archivo.cpp"));
+            Reader lector = new BufferedReader(new FileReader("D:\\NetBeansProjects\\Compi\\src\\compi\\archivoAnalisis.c"));
             Lexer lexer = new Lexer(lector);
-            HashMap<String,ArrayList<String>> token = new HashMap<String,ArrayList<String>>();
-            HashMap<String,ArrayList<String>> error = new HashMap<String,ArrayList<String>>();
-            String resultado = "";
+            LinkedHashMap<String,ArrayList<String>> token = new LinkedHashMap<String,ArrayList<String>>();
+            LinkedHashMap<String,ArrayList<String>> error = new LinkedHashMap<String,ArrayList<String>>();
             int cont = 1;
             while (true) {
                 Tokens tokens = lexer.yylex();
                 if (tokens == null) {
-                    resultado += "FIN";
-                    System.out.println(resultado);
-                    System.out.println(token);
-                    System.out.println(error);
                     crearArchivoError(error);
                     crearArchivoToken(token);
                     return;
                 }
                 switch (tokens) {
                     case ERROR:
-                        resultado += "Simbolo no definido: "+ lexer.lexeme +" en la linea "+lexer.GetLine()+"\n";
                          if (error.containsKey(lexer.lexeme)){
                             error.get(lexer.lexeme).add(String.valueOf(lexer.GetLine()));
                         }
@@ -68,11 +52,9 @@ public class Main {
                             error.put(lexer.lexeme, new ArrayList<String>());
                             error.get(lexer.lexeme).add(String.valueOf("Simbolo no definido"));
                             error.get(lexer.lexeme).add(String.valueOf(lexer.GetLine()));
-                         }
-                        //escritorErrores.write(lexer.lexeme +"    |      "+"Simbolo no definido"+"    |      "+lexer.GetLine()+"\n");
+                        }
                         break;
                     default:
-                        resultado += lexer.lexeme + ": Es un " + tokens + " en la linea "+lexer.GetLine()+"\n";
                         if (token.containsKey(lexer.lexeme)){
                             token.get(lexer.lexeme).add(String.valueOf(lexer.GetLine()));
                         }
@@ -81,7 +63,6 @@ public class Main {
                             token.get(lexer.lexeme).add(String.valueOf(tokens));
                             token.get(lexer.lexeme).add(String.valueOf(lexer.GetLine()));
                         }
-                        //escritorTokens.write(lexer.lexeme + "    |      " + tokens + "    |      "+lexer.GetLine()+"\n");
                         break;
                 }
             }
@@ -90,11 +71,10 @@ public class Main {
         } catch (IOException ex) {
             System.out.println("c");
         }
-
     }
     
-    public static void crearArchivoError(HashMap<String,ArrayList<String>> errores){
-        String rutaErrores = "C:\\Users\\jenar\\OneDrive\\Documentos\\Compi\\scanner\\ProyectoCompi\\Compi\\src\\compi\\Errores.txt";
+    public static void crearArchivoError(LinkedHashMap<String,ArrayList<String>> errores){
+        String rutaErrores = "D:\\NetBeansProjects\\Compi\\src\\compi\\Errores.txt";
         try{
             File errorFile = new File(rutaErrores);
             if (errorFile.createNewFile()){
@@ -116,7 +96,7 @@ public class Main {
                 ArrayList<String> valor = errores.get(error);
                 escritorErrores.write(error + "    |      ");
                 escritorErrores.write(valor.get(0) + "    |      ");
-                HashMap<String, Integer> lineas = new HashMap<>();
+                LinkedHashMap<String, Integer> lineas = new LinkedHashMap<>();
 
                 for(int i = 1; i<valor.size(); i++) {
                     String numLinea = valor.get(i);
@@ -147,8 +127,8 @@ public class Main {
         }
     }
     
-    public static void crearArchivoToken(HashMap<String,ArrayList<String>> tokens){
-        String rutaTokens = "C:\\Users\\jenar\\OneDrive\\Documentos\\Compi\\scanner\\ProyectoCompi\\Compi\\src\\compi\\Tokens.txt";
+    public static void crearArchivoToken(LinkedHashMap<String,ArrayList<String>> tokens){
+        String rutaTokens = "D:\\NetBeansProjects\\Compi\\src\\compi\\Tokens.txt";
         try{
             File tokenFile = new File(rutaTokens);
             if (tokenFile.createNewFile()){
@@ -170,7 +150,7 @@ public class Main {
                 ArrayList<String> valor = tokens.get(token);
                 escritorTokens.write(token + "    |      ");
                 escritorTokens.write(valor.get(0) + "    |      ");
-               HashMap<String, Integer> lineas = new HashMap<>();
+               LinkedHashMap<String, Integer> lineas = new LinkedHashMap<>();
 
                 for(int i = 1; i<valor.size(); i++) {
                     String numLinea = valor.get(i);
@@ -198,7 +178,5 @@ public class Main {
             e.printStackTrace();
         }
     }
-    
-    
 }
 

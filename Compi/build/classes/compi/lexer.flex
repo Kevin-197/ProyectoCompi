@@ -16,11 +16,11 @@ N=[0-9]+
 F=[0-9]+\.[0-9]+
 O=[0-7]+
 Hl=[a-fA-F]+
-espacio=[ ,\t,\r,\n]+
+espacio=[ \t\r\n]+
 comment = \/\/.*
 multilinecommen = \/\*[\s\S]*?\*\/
-char = \'.*\'
-string = \".*\"
+char = \'([^\\\']|\\.)*\'
+string = \"([^\\\"]|\\.)*\" 
 
 
 %{
@@ -33,11 +33,40 @@ typedef | union | unsigned | void | volatile | while {lexeme=yytext(); return Re
 
 {espacio} {/*Ignore*/}
 
-{multilinecommen} | {comment} {lexeme=yytext(); return Comment;}
+{multilinecommen} | {comment} {/*Ignore*/}
 
-"," | ";" | "++" | "--" | "==" | ">=" | ">" | "?" | "<=" | "<" | "!=" | "||" | "&&" | "!" | "=" | 
-"+"| "-" | "*" | "/" | "%" | "(" | ")" | "[" | "]" | "{" | "}" | ":" | "." | "+=" | "-=" | "*=" | 
-"/=" | "&" | "^" | "|" | ">>" | "<<" | "~" | "%=" | "&=" | "^=" | "|=" | "<<=" | ">>=" | "->" {lexeme=yytext(); return Operador;}
+"+" | "-" | "*" | "/" | "%" {lexeme=yytext(); return OperadorAritmetico;}
+
+"+=" | "-=" | "*=" | "/=" | "%=" | "=" | "<<=" | ">>=" | "&=" | "|=" | "^=" {lexeme=yytext(); return OperadorAsignacion;}
+
+"++" | "--" {lexeme=yytext(); return OperadorIncremento;}
+
+"==" | "<" | ">" | ">=" | "<=" | "!=" {lexeme=yytext(); return OperadorComparacion;}
+
+"!" | "&&" | "||" {lexeme=yytext(); return OperadorLogico;}
+
+"<<" | ">>" | "~" | "&" | "|" | "^" {lexeme=yytext(); return OperadorDeBit;}
+
+"(" {lexeme=yytext(); return ParentesisA;}
+")" {lexeme=yytext(); return ParentesisC;}
+
+"[" {lexeme=yytext(); return ParentesisCuadradoA;}
+"]" {lexeme=yytext(); return ParentesisCuadradoC;}
+
+"{" {lexeme=yytext(); return LlaveA;}
+"}" {lexeme=yytext(); return LlaveC;}
+
+"->" {lexeme=yytext(); return Flecha;}
+
+"," {lexeme=yytext(); return Coma;}
+
+";" {lexeme=yytext(); return PuntoComa;}
+
+"?" {lexeme=yytext(); return Interrogacion;}
+
+":" {lexeme=yytext(); return DosPuntos;}
+
+"." {lexeme=yytext(); return Punto;}
 
 "_" {lexeme=yytext(); return ERROR;}
 
@@ -70,6 +99,6 @@ typedef | union | unsigned | void | volatile | while {lexeme=yytext(); return Re
 
 {L}({L}|{N})* {lexeme=yytext(); return Identificador;}
 
-{char}|{string}+ {lexeme=yytext(); return Literal;}
+{char}|{string} {lexeme=yytext(); return Literal;}
 
  . {lexeme=yytext(); return ERROR;}
