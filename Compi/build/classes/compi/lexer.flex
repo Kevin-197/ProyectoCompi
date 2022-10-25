@@ -27,13 +27,32 @@ string = \"([^\\\"]|\\.)*\"
     public String lexeme;
 %}
 %%
-auto | break | case | char | const | continue | default | do | double | else | enum | extern | float | 
-for | goto | if | int | long | register | return | short | signed | sizeof | static | struct | switch | 
-typedef | union | unsigned | void | volatile | while {lexeme=yytext(); return Reservada;}
+break {lexeme=yytext(); return Break;}
+case {lexeme=yytext(); return Case;}
+char {lexeme=yytext(); return Char;}
+const {lexeme=yytext(); return Const;}
+continue {lexeme=yytext(); return Continue;}
+default {lexeme=yytext(); return Default;}
+do {lexeme=yytext(); return Do;}
+else {lexeme=yytext(); return Else;}
+for {lexeme=yytext(); return For;}
+if {lexeme=yytext(); return If;}
+int {lexeme=yytext(); return Int;}
+long {lexeme=yytext(); return Long;}
+return {lexeme=yytext(); return Return;}
+short {lexeme=yytext(); return Short;}
+switch {lexeme=yytext(); return Switch;}
+void {lexeme=yytext(); return Void;}
+while {lexeme=yytext(); return While;}
+
+auto | double | enum | extern | float | goto | register | signed | sizeof | static | struct | typedef | union | unsigned |
+volatile {lexeme=yytext(); return Reservada;}
 
 {espacio} {/*Ignore*/}
 
 {multilinecommen} | {comment} {/*Ignore*/}
+
+"\n" {lexeme=yytext(); return Linea;}
 
 "+" | "-" | "*" | "/" | "%" {lexeme=yytext(); return OperadorAritmetico;}
 
@@ -59,6 +78,8 @@ typedef | union | unsigned | void | volatile | while {lexeme=yytext(); return Re
 "->" {lexeme=yytext(); return Flecha;}
 
 "," {lexeme=yytext(); return Coma;}
+
+"main" {lexeme=yytext(); return Main;}
 
 ";" {lexeme=yytext(); return PuntoComa;}
 
