@@ -10,7 +10,6 @@ package compi;
  */
 public enum Tokens {
     Reservada,
-    Reservada,
     Break,
     Case,
     Char,
