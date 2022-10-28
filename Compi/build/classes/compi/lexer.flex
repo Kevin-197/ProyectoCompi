@@ -54,17 +54,33 @@ volatile {lexeme=yytext(); return Reservada;}
 
 "\n" {lexeme=yytext(); return Linea;}
 
-"+" | "-" | "*" | "/" | "%" {lexeme=yytext(); return OperadorAritmetico;}
+"+" {lexeme=yytext(); return OperadorSuma;}
+"-" {lexeme=yytext(); return OperadorResta;}
+"*" {lexeme=yytext(); return OperadorMulti;}
+"/" {lexeme=yytext(); return OperadorDiv;}
+"%" {lexeme=yytext(); return OperadorMod;}
 
-"+=" | "-=" | "*=" | "/=" | "%=" | "=" | "<<=" | ">>=" | "&=" | "|=" | "^=" {lexeme=yytext(); return OperadorAsignacion;}
+"+=" {lexeme=yytext(); return OperadorAsignacionSuma;}
+"-=" {lexeme=yytext(); return OperadorAsignacionResta;}
+"*=" {lexeme=yytext(); return OperadorAsignacionMul;}
+"/=" {lexeme=yytext(); return OperadorAsignacionDiv;}
+"=" {lexeme=yytext(); return OperadorAsignacion;}
 
-"++" | "--" {lexeme=yytext(); return OperadorIncremento;}
+"++" {lexeme=yytext(); return OperadorIncremento;}
+"--" {lexeme=yytext(); return OperadorDecremento;}
 
-"==" | "<" | ">" | ">=" | "<=" | "!=" {lexeme=yytext(); return OperadorComparacion;}
+"==" {lexeme=yytext(); return OperadorComparacion;}
+"<" {lexeme=yytext(); return OperadorMenor;}
+">" {lexeme=yytext(); return OperadorMayor;}
+">=" {lexeme=yytext(); return OperadorMayorIgual;}
+"<=" {lexeme=yytext(); return OperadorMenorIgual;}
+"!=" {lexeme=yytext(); return OperadorDiferencia;}
 
-"!" | "&&" | "||" {lexeme=yytext(); return OperadorLogico;}
+"!" {lexeme=yytext(); return OperadorNegacion;}
+"&&" {lexeme=yytext(); return OperadorAnd;}
+"||" {lexeme=yytext(); return OperadorOr;}
 
-"<<" | ">>" | "~" | "&" | "|" | "^" {lexeme=yytext(); return OperadorDeBit;}
+"<<" | ">>" | "~" | "&" | "|" | "^" | "%="  | "<<=" | ">>=" | "&=" | "|=" | "^=" | "->" {lexeme=yytext(); return Operador;}
 
 "(" {lexeme=yytext(); return ParentesisA;}
 ")" {lexeme=yytext(); return ParentesisC;}
@@ -74,8 +90,6 @@ volatile {lexeme=yytext(); return Reservada;}
 
 "{" {lexeme=yytext(); return LlaveA;}
 "}" {lexeme=yytext(); return LlaveC;}
-
-"->" {lexeme=yytext(); return Flecha;}
 
 "," {lexeme=yytext(); return Coma;}
 
@@ -120,6 +134,7 @@ volatile {lexeme=yytext(); return Reservada;}
 
 {L}({L}|{N})* {lexeme=yytext(); return Identificador;}
 
-{char}|{string} {lexeme=yytext(); return Literal;}
+{char} {lexeme=yytext(); return LiteralChar;}
+{string} {lexeme=yytext(); return LiteralString;}
 
  . {lexeme=yytext(); return ERROR;}

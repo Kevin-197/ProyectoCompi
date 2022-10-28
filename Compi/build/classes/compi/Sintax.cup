@@ -16,23 +16,31 @@ parser code
 :};
 
 terminal Break, Case, Char, Const, Continue, Default, Do, Else, For,
-    If, Int, Long, Return, Short, Switch, Void, While, OperadorAritmetico,
-    OperadorComparacion, OperadorLogico, OperadorAsignacion, OperadorIncremento,
-    ParentesisA, ParentesisC, LlaveA, LlaveC, Coma, PuntoComa, Punto, Literal,
-    Identificador
+    If, Int, Integer, Long, Return, Short, Switch, Void, While, OperadorSuma, 
+    OperadorResta, OperadorMulti, OperadorDiv, OperadorMod, OperadorComparacion,
+    OperadorMenor, OperadorMayor, OperadorMayorIgual, OperadorMenorIgual,
+    OperadorDiferencia, OperadorNegacion, OperadorAnd, OperadorOr, OperadorAsignacion,
+    OperadorAsignacionSuma, OperadorAsignacionResta, OperadorAsignacionMul,
+    OperadorAsignacionDiv, OperadorIncremento, OperadorDecremento,
+    ParentesisA, ParentesisC, LlaveA, LlaveC, Coma, PuntoComa, Punto, LiteralChar,
+    LiteralString, Identificador, Main
 
-non terminal INICIO, SENTENCIA, DECLARACION, DECLARACION_FOR, IF, IF_ELSE,
-    WHILE, DO_WHILE, FOR, SENTENCIA_BOOLEANA, SENTENCIA_FOR;
+non terminal FUNCION, SENTENCIA, PARAMETROS, OPERADOR_ARITMETICO2, OPERADOR_ARITMETICO1, 
+    DATO_PREFIX, OPERADOR_BOOL, OPERADOR_OR_AND, OPERADOR_ASIG, TIPO_DATO, DATO,
+    DECLARACION_LIST, DECLARACION, OPERACION1, OPERACION2, FACTOR, EXPRESION, IF, IF_ELSE,
+    WHILE, DO_WHILE, SENTENCIA_BOOLEANA;
 
-start with INICIO;
+start with FUNCION;
 
-INICIO ::= 
-    Int Main Parentesis_a Parentesis_c Llave_a SENTENCIA Llave_c |
-    Main Parentesis_a Parentesis_c Llave_a SENTENCIA Llave_c
+FUNCION ::= 
+    TIPO_DATO Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC |
+    Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC
 ;
 SENTENCIA ::= 
     SENTENCIA DECLARACION |
     DECLARACION |
+    SENTENCIA EXPRESION |
+    EXPRESION |
     SENTENCIA IF | 
     IF |
     SENTENCIA IF_ELSE |
@@ -41,44 +49,102 @@ SENTENCIA ::=
     WHILE |
     SENTENCIA DO_WHILE
     DO_WHILE |
+    SENTENCIA SWITCH
+    SWITCH |
     SENTENCIA FOR |
     FOR
 ;
-DECLARACION ::= 
-    T_dato Identificador P_coma | 
-    T_dato Identificador Op_atribucion Numero P_coma |
-    T_dato Identificador Igual Numero P_coma |
-    T_dato Identificador Op_incremento P_coma | 
-    T_dato Op_incremento Identificador P_coma | 
-    Cadena Identificador Op_atribucion Comillas Comillas P_coma |
-    Cadena Identificador Igual Comillas Comillas P_coma |
-    Cadena Identificador Op_atribucion Comillas Identificador Comillas P_coma |
-    Cadena Identificador Igual Comillas Identificador Comillas P_coma
+PARAMETROS ::= 
+    TIPO_DATO Identificador |
+    PARAMETROS Coma TIPO_DATO Identificador |
 ;
-IF ::= If Parentesis_a SENTENCIA_BOOLEANA Parentesis_c Llave_a SENTENCIA Llave_c
+OPERADOR_ARITMETICO2 ::= 
+    OperadorMulti |
+    OperadorDiv | 
+    OperadorMod
+;
+OPERADOR_ARITMETICO1 ::= 
+    OperadorSuma | 
+    OperadorResta 
+;
+DATO_PREFIX ::= 
+    OperadorSuma | 
+    OperadorResta |
+    OperadorNegacion |
+;
+OPERADOR_BOOL ::= 
+    OperadorComparacion |
+    OperadorMenor | 
+    OperadorMayor | 
+    OperadorMayorIgual | 
+    OperadorMenorIgual |
+    OperadorDiferencia  
+;
+OPERADOR_OR_AND ::= 
+    OperadorOr |
+    OperadorAnd 
+;
+OPERADOR_ASIG ::= 
+    OperadorAsignacion |
+    OperadorAsignacionSuma | 
+    OperadorAsignacionResta | 
+    OperadorAsignacionMul |
+    OperadorAsignacionDiv 
+;
+TIPO_DATO ::= 
+    Char |
+    Integer | 
+    Long | 
+    Short |
+    Short Integer | 
+    Long Integer 
+;
+DATO ::= 
+    LiteralChar |
+    Int |
+    Identificador
+;
+DECLARACION_LIST ::= 
+    Identificador |
+    DECLARACION_LIST Coma Identificador |
+    Identificador OperadorAsignacion OPERACION1 |
+    DECLARACION_LIST Coma Identificador OperadorAsignacion OPERACION1
+;
+DECLARACION ::= 
+    TIPO_DATO DECLARACION_LIST PuntoComa |
+    TIPO_DATO Const DECLARACION_LIST PuntoComa |  
+    Const TIPO_DATO DECLARACION_LIST PuntoComa
+;
+OPERACION1 ::= 
+    OPERACION1 OPERADOR_ARITMETICO1 OPERACION1 | 
+    OPERACION2
+;
+OPERACION2 ::= 
+    OPERACION2 OPERADOR_ARITMETICO2 OPERACION2 | 
+    FACTOR
+;
+FACTOR ::= 
+    ParentesisA OPERACION1 ParentesisC | 
+    DATO_PREFIX DATO |
+    OperadorDecremento Identificador |
+    OperadorIncremento Identificador |
+    Identificador OperadorDecremento |
+    Identificador OperadorIncremento 
+;
+EXPRESION ::= 
+    Identificador OPERADOR_ASIG OPERACION1 PuntoComa |
+    OPERACION1 PuntoComa
+    
+;
+IF ::= If ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC
 ;
 SENTENCIA_BOOLEANA ::= 
-    Op_booleano | 
-    Identificador Op_relacional Op_booleano |
-    Identificador Op_relacional Numero |
-    Identificador Op_relacional Identificador |
-    Identificador Op_relacional Comillas Comillas |
-    Identificador Op_relacional Comillas Identificador Comillas
+    OPERACION1 OPERADOR_BOOL OPERACION1 |
+    SENTENCIA_BOOLEANA OPERADOR_OR_AND OPERACION1 OPERADOR_BOOL OPERACION1
 ;
-IF_ELSE ::= If Parentesis_a SENTENCIA_BOOLEANA Parentesis_c Llave_a SENTENCIA Llave_c Else Llave_a SENTENCIA Llave_c
+IF_ELSE ::= If ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC Else LlaveA SENTENCIA LlaveC
 ;
-WHILE ::= While Parentesis_a SENTENCIA_BOOLEANA Parentesis_c Llave_a SENTENCIA Llave_c
+WHILE ::= While ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC
 ;
-DO_WHILE ::= Do Llave_a SENTENCIA Llave_c While Parentesis_a SENTENCIA_BOOLEANA Parentesis_c P_coma
-;
-FOR ::= For Parentesis_a SENTENCIA_FOR Parentesis_c Llave_a SENTENCIA Llave_c
-;
-SENTENCIA_FOR ::=
-    T_dato Identificador Igual Numero P_coma SENTENCIA_BOOLEANA P_coma DECLARACION_FOR |
-    Identificador Igual Numero P_coma SENTENCIA_BOOLEANA P_coma DECLARACION_FOR
-;
-DECLARACION_FOR ::= 
-    Identificador Op_atribucion Numero |
-    Identificador Op_incremento | 
-    Op_incremento Identificador
+DO_WHILE ::= Do LlaveA SENTENCIA LlaveC While ParentesisA SENTENCIA_BOOLEANA ParentesisC PuntoComa
 ;

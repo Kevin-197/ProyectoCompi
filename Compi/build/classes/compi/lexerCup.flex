@@ -58,17 +58,33 @@ volatile {return new Symbol(sym.Reservada, yychar, yyline, yytext());}
 
 "\n" {return new Symbol(sym.Linea, yychar, yyline, yytext());}
 
-"+" | "-" | "*" | "/" | "%" {return new Symbol(sym.OperadorAritmetico, yychar, yyline, yytext());}
+"+" {return new Symbol(sym.OperadorSuma, yychar, yyline, yytext());}
+"-" {return new Symbol(sym.OperadorResta, yychar, yyline, yytext());}
+"*" {return new Symbol(sym.OperadorMulti, yychar, yyline, yytext());}
+"/" {return new Symbol(sym.OperadorDiv, yychar, yyline, yytext());}
+"%" {return new Symbol(sym.OperadorMod, yychar, yyline, yytext());}
 
-"+=" | "-=" | "*=" | "/=" | "%=" | "=" | "<<=" | ">>=" | "&=" | "|=" | "^=" {return new Symbol(sym.OperadorAsignacion, yychar, yyline, yytext());}
+"+=" {return new Symbol(sym.OperadorAsignacionSuma, yychar, yyline, yytext());}
+"-=" {return new Symbol(sym.OperadorAsignacionResta, yychar, yyline, yytext());}
+"*=" {return new Symbol(sym.OperadorAsignacionMul, yychar, yyline, yytext());}
+"/=" {return new Symbol(sym.OperadorAsignacionDiv, yychar, yyline, yytext());}
+"=" {return new Symbol(sym.OperadorAsignacion, yychar, yyline, yytext());}
 
-"++" | "--" {return new Symbol(sym.OperadorIncremento, yychar, yyline, yytext());}
+"++" {return new Symbol(sym.OperadorIncremento, yychar, yyline, yytext());}
+"--" {return new Symbol(sym.OperadorDecremento, yychar, yyline, yytext());}
 
-"==" | "<" | ">" | ">=" | "<=" | "!=" {return new Symbol(sym.OperadorComparacion, yychar, yyline, yytext());}
+"==" {return new Symbol(sym.OperadorComparacion, yychar, yyline, yytext());}
+"<" {return new Symbol(sym.OperadorMenor, yychar, yyline, yytext());}
+">" {return new Symbol(sym.OperadorMayor, yychar, yyline, yytext());}
+">=" {return new Symbol(sym.OperadorMayorIgual, yychar, yyline, yytext());}
+"<=" {return new Symbol(sym.OperadorMenorIgual, yychar, yyline, yytext());}
+"!=" {return new Symbol(sym.OperadorDiferencia, yychar, yyline, yytext());}
 
-"!" | "&&" | "||" {return new Symbol(sym.OperadorLogico, yychar, yyline, yytext());}
+"!" {return new Symbol(sym.OperadorNegacion, yychar, yyline, yytext());}
+"&&" {return new Symbol(sym.OperadorAnd, yychar, yyline, yytext());}
+"||" {return new Symbol(sym.OperadorOr, yychar, yyline, yytext());}
 
-"<<" | ">>" | "~" | "&" | "|" | "^" {return new Symbol(sym.OperadorDeBit, yychar, yyline, yytext());}
+"<<" | ">>" | "~" | "&" | "|" | "^" | "%="  | "<<=" | ">>=" | "&=" | "|=" | "^=" | "->" {return new Symbol(sym.Operador, yychar, yyline, yytext());}
 
 "(" {return new Symbol(sym.ParentesisA, yychar, yyline, yytext());}
 ")" {return new Symbol(sym.ParentesisC, yychar, yyline, yytext());}
@@ -79,13 +95,11 @@ volatile {return new Symbol(sym.Reservada, yychar, yyline, yytext());}
 "{" {return new Symbol(sym.LlaveA, yychar, yyline, yytext());}
 "}" {return new Symbol(sym.LlaveC, yychar, yyline, yytext());}
 
-"->" {return new Symbol(sym.Flecha, yychar, yyline, yytext());}
-
 "," {return new Symbol(sym.Coma, yychar, yyline, yytext());}
 
 "main" {return new Symbol(sym.Main, yychar, yyline, yytext());}
 
-", yychar, yyline, yytext());" {return new Symbol(sym.PuntoComa, yychar, yyline, yytext());}
+";" {return new Symbol(sym.PuntoComa, yychar, yyline, yytext());}
 
 "?" {return new Symbol(sym.Interrogacion, yychar, yyline, yytext());}
 
@@ -124,6 +138,7 @@ volatile {return new Symbol(sym.Reservada, yychar, yyline, yytext());}
 
 {L}({L}|{N})* {return new Symbol(sym.Identificador, yychar, yyline, yytext());}
 
-{char}|{string} {return new Symbol(sym.Literal, yychar, yyline, yytext());}
+{char} {return new Symbol(sym.LiteralChar, yychar, yyline, yytext());}
+{string} {return new Symbol(sym.LiteralString, yychar, yyline, yytext());}
 
  . {return new Symbol(sym.ERROR, yychar, yyline, yytext());}
