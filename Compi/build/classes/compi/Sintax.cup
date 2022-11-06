@@ -40,8 +40,8 @@ non terminal FUNCION, SENTENCIA, PARAMETROS, OPERADOR_ARITMETICO2, OPERADOR_ARIT
 start with INICIO;
 
 INICIO ::= 
-    Define Identificador EXPRESION INICIO  |
-    Define Identificador EXPRESION PuntoComa INICIO  |
+    Define Identificador EXPRESION INICIO |
+    Define Identificador EXPRESION PuntoComa INICIO |
     DECLARACION INICIO |
     FUNCION |
     error FUNCION |
@@ -54,13 +54,16 @@ INICIO_B ::=
     Define Identificador EXPRESION |
     Define Identificador EXPRESION PuntoComa |
     DECLARACION |
-    FUNCION 
+    FUNCION |
+    error FUNCION |
+    error PuntoComa
 ;
 FUNCION ::= 
     TIPO_DATO Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC |
     Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC |
     TIPO_DATO Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC INICIO_B |
-    Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC INICIO_B 
+    Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC INICIO_B |
+    error LlaveC
     
 ;
 SENTENCIA ::= 
@@ -172,8 +175,8 @@ OPERACION2 ::=
     FACTOR
 ;
 FACTOR ::= 
-    ParentesisA OPERACION ParentesisC | 
-    DATO_PREFIX ParentesisA OPERACION ParentesisC | 
+    ParentesisA EXPRESION ParentesisC | 
+    DATO_PREFIX ParentesisA EXPRESION ParentesisC | 
     DATO_PREFIX DATO |
     DATO |
     OperadorDecremento Identificador |

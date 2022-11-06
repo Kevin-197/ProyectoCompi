@@ -1,34 +1,28 @@
-//#define prueba 
-//int prueba = ;
-int main() {
-    5+;
-    switch(prueba){
-        case 5:
-            a+;
-        break;
-        case 5:
-            a+4;
-        break;
-        case p:
-            a+;
-        break;
-        case 5:
-            a+;
-        break;
-        case p:
-            a+5;
-        break;
+void main(){
+    int input, stop;
+    stop = 1;
+    while ((input = getchar()) != EOF) {
+        stop 1 =;
+        if (input == '\t' ) {
+            putchar('\\');
+            putchar('t');
+            stop = ;
+        }
+        if (input == ' ') {
+            putchar('\\');
+            putchar('b')
+            stop = 0;
+        }
+        if (input == '\\') {
+            putchar('\\');
+            putchar('\\';
+            stop = 0;
+        }
+        else {
+            if (stop == 1) {
+                printf('%c', input);
+            }
+        }
+ 
     }
-    
-    int c = ;
-    a+4;
-    c  prueba(1 , 2,3);
-    while(a==1){
-        ap+5;
-    }
-    int c = 5;
-    int c = 5;
-    a + +;
-    a + +5;
-    4; 5*45+;
 }
