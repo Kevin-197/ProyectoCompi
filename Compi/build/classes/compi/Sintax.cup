@@ -13,7 +13,12 @@ parser code
 
     public ArrayList<Symbol> getS(){
         return this.s;
-}
+    }
+    
+    protected final static int _error_sync_size = 3;
+    protected int error_sync_size( ) {
+        return _error_sync_size;
+    }
 :};
 
 terminal Define, Write, Read, Break, Case, Char, Const, Continue, Default, Do, Else, For,
@@ -38,7 +43,9 @@ INICIO ::=
     Define Identificador EXPRESION INICIO  |
     Define Identificador EXPRESION PuntoComa INICIO  |
     DECLARACION INICIO |
-    FUNCION
+    FUNCION |
+    error FUNCION |
+    error PuntoComa
 ;
 INICIO_B ::= 
     Define Identificador EXPRESION INICIO_B  |
@@ -82,7 +89,8 @@ SENTENCIA ::=
     SENTENCIA Define Identificador EXPRESION PuntoComa |
     Define Identificador EXPRESION PuntoComa |
     error PuntoComa |
-    error LlaveC 
+    error LlaveC | 
+    error ParentesisC
 ;
 PARAMETROS ::= 
     TIPO_DATO Identificador |
@@ -209,7 +217,9 @@ ETIQUETA_SWITCH ::=
     ETIQUETA_SWITCH Case OPERACION_SWITCH1 DosPuntos SENTENCIA |
     Case OPERACION_SWITCH1 DosPuntos SENTENCIA |
     ETIQUETA_SWITCH Default DosPuntos SENTENCIA |
-    Default DosPuntos SENTENCIA
+    Default DosPuntos SENTENCIA |
+    error DosPuntos |
+    error PuntoComa
 ;
 OPERACION_SWITCH1 ::= 
     OPERACION_SWITCH1 OPERADOR_ARITMETICO1 OPERACION_SWITCH2 | 
