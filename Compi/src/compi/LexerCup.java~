@@ -311,7 +311,7 @@ class LexerCup implements java_cup.runtime.Scanner {
 
   /* user code: */
     private Symbol symbol(int type, Object value){
-        return new Symbol(type, yyline+1, yycolumn+1, value);
+        return new Symbol(type, yyline, yycolumn+1, value);
     }
     private Symbol symbol(int type){
         return new Symbol(type, yyline+1, yycolumn+1);
@@ -704,15 +704,15 @@ class LexerCup implements java_cup.runtime.Scanner {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
-            { return new Symbol(sym.ERROR, yychar, yyline, yytext());
+            { return new Symbol(sym.ERROR, yycolumn, yyline, yytext());
             }
           case 54: break;
           case 2: 
-            { return new Symbol(sym.Identificador, yychar, yyline, yytext());
+            { return new Symbol(sym.Identificador, yycolumn, yyline, yytext());
             }
           case 55: break;
           case 3: 
-            { return new Symbol(sym.Int, yychar, yyline, yytext());
+            { return new Symbol(sym.Int, yycolumn, yyline, yytext());
             }
           case 56: break;
           case 4: 
@@ -720,199 +720,199 @@ class LexerCup implements java_cup.runtime.Scanner {
             }
           case 57: break;
           case 5: 
-            { return new Symbol(sym.OperadorDiv, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorDiv, yycolumn, yyline, yytext());
             }
           case 58: break;
           case 6: 
-            { return new Symbol(sym.OperadorMulti, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorMulti, yycolumn, yyline, yytext());
             }
           case 59: break;
           case 7: 
-            { return new Symbol(sym.OperadorSuma, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorSuma, yycolumn, yyline, yytext());
             }
           case 60: break;
           case 8: 
-            { return new Symbol(sym.OperadorResta, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorResta, yycolumn, yyline, yytext());
             }
           case 61: break;
           case 9: 
-            { return new Symbol(sym.OperadorMod, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorMod, yycolumn, yyline, yytext());
             }
           case 62: break;
           case 10: 
-            { return new Symbol(sym.OperadorAsignacion, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorAsignacion, yycolumn, yyline, yytext());
             }
           case 63: break;
           case 11: 
-            { return new Symbol(sym.OperadorMenor, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorMenor, yycolumn, yyline, yytext());
             }
           case 64: break;
           case 12: 
-            { return new Symbol(sym.OperadorMayor, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorMayor, yycolumn, yyline, yytext());
             }
           case 65: break;
           case 13: 
-            { return new Symbol(sym.OperadorNegacion, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorNegacion, yycolumn, yyline, yytext());
             }
           case 66: break;
           case 14: 
-            { return new Symbol(sym.ParentesisA, yychar, yyline, yytext());
+            { return new Symbol(sym.ParentesisA, yycolumn, yyline, yytext());
             }
           case 67: break;
           case 15: 
-            { return new Symbol(sym.ParentesisC, yychar, yyline, yytext());
+            { return new Symbol(sym.ParentesisC, yycolumn, yyline, yytext());
             }
           case 68: break;
           case 16: 
-            { return new Symbol(sym.LlaveA, yychar, yyline, yytext());
+            { return new Symbol(sym.LlaveA, yycolumn, yyline, yytext());
             }
           case 69: break;
           case 17: 
-            { return new Symbol(sym.LlaveC, yychar, yyline, yytext());
+            { return new Symbol(sym.LlaveC, yycolumn, yyline, yytext());
             }
           case 70: break;
           case 18: 
-            { return new Symbol(sym.Coma, yychar, yyline, yytext());
+            { return new Symbol(sym.Coma, yycolumn, yyline, yytext());
             }
           case 71: break;
           case 19: 
-            { return new Symbol(sym.PuntoComa, yychar, yyline, yytext());
+            { return new Symbol(sym.PuntoComa, yycolumn, yyline, yytext());
             }
           case 72: break;
           case 20: 
-            { return new Symbol(sym.DosPuntos, yychar, yyline, yytext());
+            { return new Symbol(sym.DosPuntos, yycolumn, yyline, yytext());
             }
           case 73: break;
           case 21: 
-            { return new Symbol(sym.OperadorAsignacionDiv, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorAsignacionDiv, yycolumn, yyline, yytext());
             }
           case 74: break;
           case 22: 
-            { return new Symbol(sym.OperadorAsignacionMul, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorAsignacionMul, yycolumn, yyline, yytext());
             }
           case 75: break;
           case 23: 
-            { return new Symbol(sym.LiteralChar, yychar, yyline, yytext());
+            { return new Symbol(sym.LiteralChar, yycolumn, yyline, yytext());
             }
           case 76: break;
           case 24: 
-            { return new Symbol(sym.Do, yychar, yyline, yytext());
+            { return new Symbol(sym.Do, yycolumn, yyline, yytext());
             }
           case 77: break;
           case 25: 
-            { return new Symbol(sym.If, yychar, yyline, yytext());
+            { return new Symbol(sym.If, yycolumn, yyline, yytext());
             }
           case 78: break;
           case 26: 
-            { return new Symbol(sym.OperadorIncremento, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorIncremento, yycolumn, yyline, yytext());
             }
           case 79: break;
           case 27: 
-            { return new Symbol(sym.OperadorAsignacionSuma, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorAsignacionSuma, yycolumn, yyline, yytext());
             }
           case 80: break;
           case 28: 
-            { return new Symbol(sym.OperadorDecremento, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorDecremento, yycolumn, yyline, yytext());
             }
           case 81: break;
           case 29: 
-            { return new Symbol(sym.OperadorAsignacionResta, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorAsignacionResta, yycolumn, yyline, yytext());
             }
           case 82: break;
           case 30: 
-            { return new Symbol(sym.OperadorComparacion, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorComparacion, yycolumn, yyline, yytext());
             }
           case 83: break;
           case 31: 
-            { return new Symbol(sym.OperadorMenorIgual, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorMenorIgual, yycolumn, yyline, yytext());
             }
           case 84: break;
           case 32: 
-            { return new Symbol(sym.OperadorMayorIgual, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorMayorIgual, yycolumn, yyline, yytext());
             }
           case 85: break;
           case 33: 
-            { return new Symbol(sym.OperadorDiferencia, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorDiferencia, yycolumn, yyline, yytext());
             }
           case 86: break;
           case 34: 
-            { return new Symbol(sym.OperadorAnd, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorAnd, yycolumn, yyline, yytext());
             }
           case 87: break;
           case 35: 
-            { return new Symbol(sym.OperadorOr, yychar, yyline, yytext());
+            { return new Symbol(sym.OperadorOr, yycolumn, yyline, yytext());
             }
           case 88: break;
           case 36: 
-            { return new Symbol(sym.For, yychar, yyline, yytext());
+            { return new Symbol(sym.For, yycolumn, yyline, yytext());
             }
           case 89: break;
           case 37: 
-            { return new Symbol(sym.Integer, yychar, yyline, yytext());
+            { return new Symbol(sym.Integer, yycolumn, yyline, yytext());
             }
           case 90: break;
           case 38: 
-            { return new Symbol(sym.Else, yychar, yyline, yytext());
+            { return new Symbol(sym.Else, yycolumn, yyline, yytext());
             }
           case 91: break;
           case 39: 
-            { return new Symbol(sym.Read, yychar, yyline, yytext());
+            { return new Symbol(sym.Read, yycolumn, yyline, yytext());
             }
           case 92: break;
           case 40: 
-            { return new Symbol(sym.Case, yychar, yyline, yytext());
+            { return new Symbol(sym.Case, yycolumn, yyline, yytext());
             }
           case 93: break;
           case 41: 
-            { return new Symbol(sym.Char, yychar, yyline, yytext());
+            { return new Symbol(sym.Char, yycolumn, yyline, yytext());
             }
           case 94: break;
           case 42: 
-            { return new Symbol(sym.Long, yychar, yyline, yytext());
+            { return new Symbol(sym.Long, yycolumn, yyline, yytext());
             }
           case 95: break;
           case 43: 
-            { return new Symbol(sym.Void, yychar, yyline, yytext());
+            { return new Symbol(sym.Void, yycolumn, yyline, yytext());
             }
           case 96: break;
           case 44: 
-            { return new Symbol(sym.Write, yychar, yyline, yytext());
+            { return new Symbol(sym.Write, yycolumn, yyline, yytext());
             }
           case 97: break;
           case 45: 
-            { return new Symbol(sym.While, yychar, yyline, yytext());
+            { return new Symbol(sym.While, yycolumn, yyline, yytext());
             }
           case 98: break;
           case 46: 
-            { return new Symbol(sym.Break, yychar, yyline, yytext());
+            { return new Symbol(sym.Break, yycolumn, yyline, yytext());
             }
           case 99: break;
           case 47: 
-            { return new Symbol(sym.Const, yychar, yyline, yytext());
+            { return new Symbol(sym.Const, yycolumn, yyline, yytext());
             }
           case 100: break;
           case 48: 
-            { return new Symbol(sym.Short, yychar, yyline, yytext());
+            { return new Symbol(sym.Short, yycolumn, yyline, yytext());
             }
           case 101: break;
           case 49: 
-            { return new Symbol(sym.Return, yychar, yyline, yytext());
+            { return new Symbol(sym.Return, yycolumn, yyline, yytext());
             }
           case 102: break;
           case 50: 
-            { return new Symbol(sym.Switch, yychar, yyline, yytext());
+            { return new Symbol(sym.Switch, yycolumn, yyline, yytext());
             }
           case 103: break;
           case 51: 
-            { return new Symbol(sym.Define, yychar, yyline, yytext());
+            { return new Symbol(sym.Define, yycolumn, yyline, yytext());
             }
           case 104: break;
           case 52: 
-            { return new Symbol(sym.Default, yychar, yyline, yytext());
+            { return new Symbol(sym.Default, yycolumn, yyline, yytext());
             }
           case 105: break;
           case 53: 
-            { return new Symbol(sym.Continue, yychar, yyline, yytext());
+            { return new Symbol(sym.Continue, yycolumn, yyline, yytext());
             }
           case 106: break;
           default:
