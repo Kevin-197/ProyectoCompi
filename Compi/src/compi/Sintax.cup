@@ -1,62 +1,98 @@
 package compi;
 
 import java_cup.runtime.Symbol;
+import java.util.ArrayList;
 
 parser code
 {:
-    private Symbol s;
+    private ArrayList<Symbol> s = new ArrayList<Symbol>();
     
     public void syntax_error(Symbol s){
-        this.s = s;
+        this.s.add(s);
     }
 
-    public Symbol getS(){
+    public ArrayList<Symbol> getS(){
         return this.s;
 }
 :};
 
-terminal Break, Case, Char, Const, Continue, Default, Do, Else, For,
-    If, Int, Integer, Long, Return, Short, Switch, Void, While, OperadorSuma, 
-    OperadorResta, OperadorMulti, OperadorDiv, OperadorMod, OperadorComparacion,
-    OperadorMenor, OperadorMayor, OperadorMayorIgual, OperadorMenorIgual,
-    OperadorDiferencia, OperadorNegacion, OperadorAnd, OperadorOr, OperadorAsignacion,
+terminal Define, Write, Read, Break, Case, Char, Const, Continue, Default, Do, Else, For,
+    If, Integer, Long, Return, Short, Switch, Void, While, OperadorSuma, 
+    OperadorResta, OperadorMulti, OperadorDiv, OperadorMod, 
     OperadorAsignacionSuma, OperadorAsignacionResta, OperadorAsignacionMul,
-    OperadorAsignacionDiv, OperadorIncremento, OperadorDecremento,
-    ParentesisA, ParentesisC, LlaveA, LlaveC, Coma, PuntoComa, Punto, LiteralChar,
-    LiteralString, Identificador, Main
+    OperadorAsignacionDiv, OperadorAsignacion, OperadorIncremento, OperadorDecremento, 
+    OperadorComparacion, OperadorMenor, OperadorMayor, OperadorMayorIgual, OperadorMenorIgual,
+    OperadorDiferencia, OperadorNegacion, OperadorAnd, OperadorOr, 
+    ParentesisA, ParentesisC, LlaveA, LlaveC, Coma, PuntoComa, DosPuntos, Int, Identificador, LiteralChar, ERROR;
 
 non terminal FUNCION, SENTENCIA, PARAMETROS, OPERADOR_ARITMETICO2, OPERADOR_ARITMETICO1, 
     DATO_PREFIX, OPERADOR_BOOL, OPERADOR_OR_AND, OPERADOR_ASIG, TIPO_DATO, DATO,
-    DECLARACION_LIST, DECLARACION, OPERACION1, OPERACION2, FACTOR, EXPRESION, IF, IF_ELSE,
-    WHILE, DO_WHILE, SENTENCIA_BOOLEANA;
+    DECLARACION_LIST, DECLARACION, OPERACION, OPERACION1, OPERACION2, FACTOR, EXPRESION, IF, IF_ELSE,
+    INSTRUCCIONES_CONTROL, WHILE, DO_WHILE, SENTENCIA_BOOLEANA, SENTENCIA_FOR, LISTA_EXPRESIONES, FOR,
+    READ, WRITE, LISTA_IDENTIFICADORES, INICIO, INICIO_B, SWITCH, ETIQUETA_SWITCH, OPERACION_SWITCH1,
+    OPERACION_SWITCH2, CONSTANT_FACTOR;
 
-start with FUNCION;
+start with INICIO;
 
+INICIO ::= 
+    Define Identificador EXPRESION INICIO  |
+    Define Identificador EXPRESION PuntoComa INICIO  |
+    DECLARACION INICIO |
+    FUNCION
+;
+INICIO_B ::= 
+    Define Identificador EXPRESION INICIO_B  |
+    Define Identificador EXPRESION PuntoComa INICIO_B  |
+    DECLARACION INICIO_B |
+    Define Identificador EXPRESION |
+    Define Identificador EXPRESION PuntoComa |
+    DECLARACION |
+    FUNCION 
+;
 FUNCION ::= 
     TIPO_DATO Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC |
-    Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC
+    Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC |
+    TIPO_DATO Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC INICIO_B |
+    Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC INICIO_B 
+    
 ;
 SENTENCIA ::= 
     SENTENCIA DECLARACION |
     DECLARACION |
-    SENTENCIA EXPRESION |
-    EXPRESION |
+    SENTENCIA EXPRESION PuntoComa |
+    EXPRESION PuntoComa |
+    SENTENCIA INSTRUCCIONES_CONTROL |
+    INSTRUCCIONES_CONTROL |
+    SENTENCIA READ |
+    READ |
+    SENTENCIA WRITE |
+    WRITE |
     SENTENCIA IF | 
     IF |
     SENTENCIA IF_ELSE |
     IF_ELSE |
     SENTENCIA WHILE |
     WHILE |
-    SENTENCIA DO_WHILE
+    SENTENCIA DO_WHILE |
     DO_WHILE |
-    SENTENCIA SWITCH
-    SWITCH |
     SENTENCIA FOR |
-    FOR
+    FOR |
+    SENTENCIA SWITCH |
+    SWITCH |
+    SENTENCIA Define Identificador EXPRESION PuntoComa |
+    Define Identificador EXPRESION PuntoComa |
+    error PuntoComa |
+    error LlaveC
 ;
 PARAMETROS ::= 
     TIPO_DATO Identificador |
     PARAMETROS Coma TIPO_DATO Identificador |
+;
+INSTRUCCIONES_CONTROL ::= 
+    Return EXPRESION PuntoComa |
+    Return PuntoComa |
+    Break PuntoComa |
+    Continue PuntoComa
 ;
 OPERADOR_ARITMETICO2 ::= 
     OperadorMulti |
@@ -70,7 +106,7 @@ OPERADOR_ARITMETICO1 ::=
 DATO_PREFIX ::= 
     OperadorSuma | 
     OperadorResta |
-    OperadorNegacion |
+    OperadorNegacion  
 ;
 OPERADOR_BOOL ::= 
     OperadorComparacion |
@@ -107,44 +143,95 @@ DATO ::=
 DECLARACION_LIST ::= 
     Identificador |
     DECLARACION_LIST Coma Identificador |
-    Identificador OperadorAsignacion OPERACION1 |
-    DECLARACION_LIST Coma Identificador OperadorAsignacion OPERACION1
+    Identificador OperadorAsignacion OPERACION |
+    DECLARACION_LIST Coma Identificador OperadorAsignacion OPERACION
 ;
 DECLARACION ::= 
     TIPO_DATO DECLARACION_LIST PuntoComa |
     TIPO_DATO Const DECLARACION_LIST PuntoComa |  
-    Const TIPO_DATO DECLARACION_LIST PuntoComa
+    Const TIPO_DATO DECLARACION_LIST PuntoComa 
+;
+OPERACION ::= 
+    OPERACION OPERADOR_BOOL OPERACION1 | 
+    OPERACION1
 ;
 OPERACION1 ::= 
-    OPERACION1 OPERADOR_ARITMETICO1 OPERACION1 | 
+    OPERACION1 OPERADOR_ARITMETICO1 OPERACION2 | 
     OPERACION2
 ;
 OPERACION2 ::= 
-    OPERACION2 OPERADOR_ARITMETICO2 OPERACION2 | 
+    OPERACION2 OPERADOR_ARITMETICO2 FACTOR | 
     FACTOR
 ;
 FACTOR ::= 
-    ParentesisA OPERACION1 ParentesisC | 
+    ParentesisA OPERACION ParentesisC | 
+    DATO_PREFIX ParentesisA OPERACION ParentesisC | 
     DATO_PREFIX DATO |
+    DATO |
     OperadorDecremento Identificador |
     OperadorIncremento Identificador |
     Identificador OperadorDecremento |
-    Identificador OperadorIncremento 
+    Identificador OperadorIncremento |
+    Identificador ParentesisA LISTA_EXPRESIONES ParentesisC |
+    Identificador ParentesisA ParentesisC
 ;
 EXPRESION ::= 
-    Identificador OPERADOR_ASIG OPERACION1 PuntoComa |
-    OPERACION1 PuntoComa
-    
+    Identificador OPERADOR_ASIG OPERACION |
+    OPERACION 
 ;
-IF ::= If ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC
+READ ::= Read ParentesisA ParentesisC PuntoComa |
+    Read ParentesisA LISTA_IDENTIFICADORES ParentesisC PuntoComa
+;
+WRITE ::= Write ParentesisA LISTA_EXPRESIONES ParentesisC PuntoComa
+;
+IF ::= If ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC 
 ;
 SENTENCIA_BOOLEANA ::= 
-    OPERACION1 OPERADOR_BOOL OPERACION1 |
-    SENTENCIA_BOOLEANA OPERADOR_OR_AND OPERACION1 OPERADOR_BOOL OPERACION1
+    OPERACION |
+    Identificador OPERADOR_ASIG OPERACION |
+    SENTENCIA_BOOLEANA OPERADOR_OR_AND OPERACION 
 ;
 IF_ELSE ::= If ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC Else LlaveA SENTENCIA LlaveC
 ;
 WHILE ::= While ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC
 ;
 DO_WHILE ::= Do LlaveA SENTENCIA LlaveC While ParentesisA SENTENCIA_BOOLEANA ParentesisC PuntoComa
+;
+FOR ::= For ParentesisA SENTENCIA_FOR ParentesisC LlaveA SENTENCIA LlaveC
+;
+SENTENCIA_FOR ::=
+    TIPO_DATO DECLARACION_LIST PuntoComa SENTENCIA_BOOLEANA PuntoComa LISTA_EXPRESIONES |
+    DECLARACION_LIST PuntoComa SENTENCIA_BOOLEANA PuntoComa LISTA_EXPRESIONES
+;
+SWITCH ::= Switch ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA ETIQUETA_SWITCH LlaveC
+;
+ETIQUETA_SWITCH ::=
+    ETIQUETA_SWITCH Case OPERACION_SWITCH1 DosPuntos SENTENCIA |
+    Case OPERACION_SWITCH1 DosPuntos SENTENCIA |
+    ETIQUETA_SWITCH Default DosPuntos SENTENCIA |
+    Default DosPuntos SENTENCIA
+;
+OPERACION_SWITCH1 ::= 
+    OPERACION_SWITCH1 OPERADOR_ARITMETICO1 OPERACION_SWITCH2 | 
+    OPERACION_SWITCH2
+;
+OPERACION_SWITCH2 ::= 
+    OPERACION_SWITCH2 OPERADOR_ARITMETICO2 CONSTANT_FACTOR | 
+    CONSTANT_FACTOR
+;
+CONSTANT_FACTOR ::= 
+    ParentesisA OPERACION_SWITCH1 ParentesisC | 
+    DATO_PREFIX ParentesisA OPERACION_SWITCH1 ParentesisC | 
+    DATO_PREFIX Int |
+    Int |
+    DATO_PREFIX LiteralChar |
+    LiteralChar
+;
+LISTA_EXPRESIONES ::= 
+    EXPRESION |
+    LISTA_EXPRESIONES Coma EXPRESION  
+;
+LISTA_IDENTIFICADORES ::= 
+    Identificador |
+    DECLARACION_LIST Coma Identificador
 ;

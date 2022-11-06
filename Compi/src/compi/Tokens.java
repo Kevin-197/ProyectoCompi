@@ -9,6 +9,9 @@ package compi;
  * @author kevin
  */
 public enum Tokens {
+    Define,
+    Write,
+    Read,
     Reservada,
     Break,
     Case,

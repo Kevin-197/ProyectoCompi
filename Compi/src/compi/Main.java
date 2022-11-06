@@ -10,37 +10,64 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java_cup.runtime.Symbol;
 
 /**
  *
  * @author kevin
  */
 public class Main {
-    public static void main(String[] args) throws IOException {
-        String ruta = "D:\\NetBeansProjects\\Compi\\src\\compi\\lexer.flex";
-        generarLexer(ruta);
-        probarLexer();
+
+    public static void main(String[] args) throws Exception {
+        String ruta1 = "D:/RepoVR/ProyectoCompi/Compi/src/compi/Lexer.flex";
+        String ruta2 = "D:/RepoVR/ProyectoCompi/Compi/src/compi/LexerCup.flex";
+        String[] rutaS = {"-parser", "Sintax", "D:/RepoVR/ProyectoCompi/Compi/src/compi/Sintax.cup"};
+        generar(ruta1, ruta2, rutaS);
+        AnalisisLexico();
+        AnalisisSintactico();
     }
     
-    public static void generarLexer(String ruta){
-        File archivo = new File(ruta);
+    public static void generar(String ruta1, String ruta2, String[] rutaS) throws IOException, Exception{
+        File archivo;
+        archivo = new File(ruta1);
         jflex.Main.generate(archivo);
+        archivo = new File(ruta2);
+        jflex.Main.generate(archivo);
+        java_cup.Main.main(rutaS);
+        
+        Path rutaSym = Paths.get("D:/RepoVR/ProyectoCompi/Compi/src/compi/sym.java");
+        if (Files.exists(rutaSym)) {
+            Files.delete(rutaSym);
+        }
+        Files.move(
+                Paths.get("D:/RepoVR/ProyectoCompi/Compi/sym.java"), 
+                Paths.get("D:/RepoVR/ProyectoCompi/Compi/src/compi/sym.java")
+        );
+        Path rutaSin = Paths.get("D:/RepoVR/ProyectoCompi/Compi/src/compi/Sintax.java");
+        if (Files.exists(rutaSin)) {
+            Files.delete(rutaSin);
+        }
+        Files.move(
+                Paths.get("D:/RepoVR/ProyectoCompi/Compi/Sintax.java"), 
+                Paths.get("D:/RepoVR/ProyectoCompi/Compi/src/compi/Sintax.java")
+        );
     }
-    
-    public static void probarLexer() throws IOException{
+    public static void AnalisisLexico() throws IOException{
         try {
-            Reader lector = new BufferedReader(new FileReader("D:\\NetBeansProjects\\Compi\\src\\compi\\archivoAnalisis.c"));
+            Reader lector = new BufferedReader(new FileReader("D:/RepoVR/ProyectoCompi/Compi/src/compi/archivoAnalisis.c"));
             Lexer lexer = new Lexer(lector);
-            LinkedHashMap<String,ArrayList<String>> token = new LinkedHashMap<String,ArrayList<String>>();
             LinkedHashMap<String,ArrayList<String>> error = new LinkedHashMap<String,ArrayList<String>>();
             int cont = 1;
             while (true) {
                 Tokens tokens = lexer.yylex();
                 if (tokens == null) {
                     crearArchivoError(error);
-                    crearArchivoToken(token);
                     return;
                 }
                 switch (tokens) {
@@ -54,18 +81,9 @@ public class Main {
                             error.get(lexer.lexeme).add(String.valueOf(lexer.GetLine()));
                         }
                         break;
-                    default:
-                        if (token.containsKey(lexer.lexeme)){
-                            token.get(lexer.lexeme).add(String.valueOf(lexer.GetLine()));
-                        }
-                        else{
-                            token.put(lexer.lexeme, new ArrayList<String>());
-                            token.get(lexer.lexeme).add(String.valueOf(tokens));
-                            token.get(lexer.lexeme).add(String.valueOf(lexer.GetLine()));
-                        }
-                        break;
                 }
             }
+            
         } catch (FileNotFoundException ex) {
             System.out.println("b");
         } catch (IOException ex) {
@@ -74,7 +92,7 @@ public class Main {
     }
     
     public static void crearArchivoError(LinkedHashMap<String,ArrayList<String>> errores){
-        String rutaErrores = "D:\\NetBeansProjects\\Compi\\src\\compi\\Errores.txt";
+        String rutaErrores = "D:/RepoVR/ProyectoCompi/Compi/src/compi/Errores.txt";
         try{
             File errorFile = new File(rutaErrores);
             if (errorFile.createNewFile()){
@@ -127,56 +145,31 @@ public class Main {
         }
     }
     
-    public static void crearArchivoToken(LinkedHashMap<String,ArrayList<String>> tokens){
-        String rutaTokens = "D:\\NetBeansProjects\\Compi\\src\\compi\\Tokens.txt";
-        try{
-            File tokenFile = new File(rutaTokens);
-            if (tokenFile.createNewFile()){
-                System.out.println("Archivo creado: " + tokenFile.getName());
+    public static void AnalisisSintactico() throws IOException{
+        File archivo = new File("D:/RepoVR/ProyectoCompi/Compi/src/compi/archivoAnalisis.c");
+        String archivoAnalisis = new String(Files.readAllBytes(archivo.toPath()));
+        Sintax s = new Sintax(new LexerCup(new StringReader(archivoAnalisis)));
+        System.out.println("\n\n-----------------------------------\n\n");
+        try {
+            s.parse();
+            ArrayList<Symbol> sym = s.getS();
+            if(sym.isEmpty()){
+                System.out.println("\u001B[32m"+"Analisis realizado correctamente"+"\u001B[32m");
             }
             else{
-                System.out.println("El archivo tokens ya existe.");
-                
-            }
-        }
-        catch (IOException e){
-            System.out.println("Error al crear los archivos");
-            e.printStackTrace();
-        }
-        try{
-            FileWriter escritorTokens = new FileWriter(rutaTokens,false);
-            escritorTokens.write("Token    |      Tipo de Token    |      Linea" + "\n");
-            for (String token:tokens.keySet()){
-                ArrayList<String> valor = tokens.get(token);
-                escritorTokens.write(token + "    |      ");
-                escritorTokens.write(valor.get(0) + "    |      ");
-               LinkedHashMap<String, Integer> lineas = new LinkedHashMap<>();
+                for (int i = 0; i < s.getS().size(); i++) {
+                    System.out.println("\u001B[31m"+"Error de sintaxis. Linea: " + (sym.get(i).right + 1) + " Columna: " + (sym.get(i).left + 1) + ", Texto: \"" + sym.get(i).value + "\"\n"+"\u001B[31m");
+                }
 
-                for(int i = 1; i<valor.size(); i++) {
-                    String numLinea = valor.get(i);
-                    if(lineas.containsKey(numLinea)) {
-                        lineas.put(numLinea, lineas.get(numLinea)+1);
-                    } else {
-                        lineas.put(numLinea, 1);
-                    }
-                    
-                }
-                for (String linea:lineas.keySet()){
-                    if (lineas.get(linea) > 1)
-                        escritorTokens.write(linea +"(" + lineas.get(linea) + ")" + " ");
-                    else
-                        escritorTokens.write(linea + " ");
-                }
-               escritorTokens.write("\n");
             }
-            
-            escritorTokens.close();
-            
-        }
-        catch (IOException e){
-            System.out.println("Error al escribir los archivos");
-            e.printStackTrace();
+
+        } catch (Exception ex) {
+            ArrayList<Symbol> sym = s.getS();
+            for (int i = 0; i < s.getS().size(); i++) {
+                System.out.println("\u001B[31m"+"Error de sintaxis. Linea: " + (sym.get(i).right + 1) + " Columna: " + (sym.get(i).left + 1) + ", Texto: \"" + sym.get(i).value + "\"\n"+"\u001B[31m");
+            }
         }
     }
+    
 }
 

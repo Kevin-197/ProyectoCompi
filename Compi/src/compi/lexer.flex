@@ -1,5 +1,4 @@
 package compi;
-
 import static compi.Tokens.*;
 %%
 %class Lexer
@@ -27,6 +26,9 @@ string = \"([^\\\"]|\\.)*\"
     public String lexeme;
 %}
 %%
+"#"define {lexeme=yytext(); return Define;}
+write {lexeme=yytext(); return Write;}
+read {lexeme=yytext(); return Read;}
 break {lexeme=yytext(); return Break;}
 case {lexeme=yytext(); return Case;}
 char {lexeme=yytext(); return Char;}

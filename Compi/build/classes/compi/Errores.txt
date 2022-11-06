@@ -1,2 +1,2 @@
 Token    |      Tipo de Error    |     Linea
-#    |      Simbolo no definido    |      3 4 
+ñ    |      Simbolo no definido    |      5 
