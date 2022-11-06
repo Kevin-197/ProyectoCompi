@@ -44,8 +44,8 @@ INICIO ::=
     Define Identificador EXPRESION PuntoComa INICIO |
     DECLARACION INICIO |
     FUNCION |
-    error FUNCION |
-    error PuntoComa
+    error LlaveC INICIO_B |
+    error PuntoComa INICIO
 ;
 INICIO_B ::= 
     Define Identificador EXPRESION INICIO_B  |
@@ -55,15 +55,14 @@ INICIO_B ::=
     Define Identificador EXPRESION PuntoComa |
     DECLARACION |
     FUNCION |
-    error FUNCION |
-    error PuntoComa
+    error LlaveC INICIO_B |
+    error PuntoComa INICIO_B
 ;
 FUNCION ::= 
     TIPO_DATO Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC |
     Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC |
     TIPO_DATO Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC INICIO_B |
-    Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC INICIO_B |
-    error LlaveC
+    Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC INICIO_B
     
 ;
 SENTENCIA ::= 
