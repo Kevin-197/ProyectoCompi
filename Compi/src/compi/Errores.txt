@@ -1,2 +1,1 @@
 Token    |      Tipo de Error    |     Linea
-ñ    |      Simbolo no definido    |      5 

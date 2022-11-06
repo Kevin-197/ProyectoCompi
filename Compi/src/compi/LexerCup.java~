@@ -311,10 +311,10 @@ class LexerCup implements java_cup.runtime.Scanner {
 
   /* user code: */
     private Symbol symbol(int type, Object value){
-        return new Symbol(type, yyline, yycolumn, value);
+        return new Symbol(type, yyline+1, yycolumn+1, value);
     }
     private Symbol symbol(int type){
-        return new Symbol(type, yyline, yycolumn);
+        return new Symbol(type, yyline+1, yycolumn+1);
     }
 
 
@@ -595,10 +595,12 @@ class LexerCup implements java_cup.runtime.Scanner {
         case '\u2028':
         case '\u2029':
           yyline++;
+          yycolumn = 0;
           zzR = false;
           break;
         case '\r':
           yyline++;
+          yycolumn = 0;
           zzR = true;
           break;
         case '\n':
@@ -606,10 +608,12 @@ class LexerCup implements java_cup.runtime.Scanner {
             zzR = false;
           else {
             yyline++;
+            yycolumn = 0;
           }
           break;
         default:
           zzR = false;
+          yycolumn += zzCharCount;
         }
       }
 

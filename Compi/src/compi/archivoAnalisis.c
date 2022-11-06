@@ -1,8 +1,11 @@
 #define prueba 3
 int main()
 {
-    a+prueba;
-    int c = ñ;
-    prueba + prueba+c;
-    c;
+    5+5;
+    if(1===1){
+        ap+;
+    }
+    int c = ;
+    a + +5;
+    //; 5*45+int;
 }

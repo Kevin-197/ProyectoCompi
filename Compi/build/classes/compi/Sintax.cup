@@ -82,7 +82,7 @@ SENTENCIA ::=
     SENTENCIA Define Identificador EXPRESION PuntoComa |
     Define Identificador EXPRESION PuntoComa |
     error PuntoComa |
-    error LlaveC
+    error LlaveC 
 ;
 PARAMETROS ::= 
     TIPO_DATO Identificador |
