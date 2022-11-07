@@ -31,7 +31,7 @@ void main(1){
 }
 #define a ;
 int prueba = 1;
-void main(){
+void main(2){
     int input, stop;
     stop = 1;
     while ((input = getchar()) != EOF) {
@@ -59,9 +59,9 @@ void main(){
  
     }
 }
-#define a p
+#define a ;
 int prueba = ;
-void main(){
+void main(3){
     int input, stop;
     stop = 1;
     while ((input = getchar()) != EOF) {

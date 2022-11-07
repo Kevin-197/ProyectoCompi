@@ -158,7 +158,11 @@ public class Main {
             }
             else{
                 for (int i = 0; i < s.getS().size(); i++) {
-                    System.out.println("\u001B[31m"+"Error de sintaxis. Linea: " + (sym.get(i).right + 1) + " Columna: " + (sym.get(i).left + 1) + ", Texto: \"" + sym.get(i).value + "\"\n"+"\u001B[31m");
+                    if(sym.get(i).value==null){
+                        System.out.println("\u001B[31m"+"Error de sintaxis. Una de las funciones no tiene llave de cierre"+"\u001B[31m");
+                    }
+                        System.out.println("\u001B[31m"+"Error de sintaxis. Linea: " + (sym.get(i).right + 1) + " Columna: " + (sym.get(i).left + 1) + ", Caracter del error: \"" + sym.get(i).value + "\"\n"+"\u001B[31m");
+                    
                 }
 
             }
@@ -166,7 +170,10 @@ public class Main {
         } catch (Exception ex) {
             ArrayList<Symbol> sym = s.getS();
             for (int i = 0; i < s.getS().size(); i++) {
-                System.out.println("\u001B[31m"+"Error de sintaxis. Linea: " + (sym.get(i).right + 1) + " Columna: " + (sym.get(i).left + 1) + ", Texto: \"" + sym.get(i).value + "\"\n"+"\u001B[31m");
+                if(sym.get(i).value==null){
+                    System.out.println("\u001B[31m"+"Error de sintaxis. Una de las funciones no tiene llave de cierre"+"\u001B[31m");
+                }
+                System.out.println("\u001B[31m"+"Error de sintaxis. Linea: " + (sym.get(i).right + 1) + " Columna: " + (sym.get(i).left + 1) + ", Caracter del error: \"" + sym.get(i).value + "\"\n"+"\u001B[31m");
             }
         }
     }
