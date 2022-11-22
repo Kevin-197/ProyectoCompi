@@ -19,6 +19,23 @@ parser code
     protected int error_sync_size( ) {
         return _error_sync_size;
     }
+
+    public TablaSimbolos tabla = TablaSimbolos.getInstance();
+    public PilaSemantica pila = PilaSemantica.getInstance();
+    
+    public void GuardarRS_Tipo(String Tipo){
+        RS_Tipo tipo = new RS_Tipo(Tipo);
+        this.pila.Push(tipo);
+    }
+
+    public void GuardarRS_Var(String Id, int Line, int Column){
+        RS_Var var = new RS_Var(Id,Line,Column);
+        this.pila.Push(var);
+    }
+
+    public void GuardarDeclaracionTS(String Ambito){
+        this.pila.GuardarVariable(Ambito);
+    }
 :};
 
 terminal Define, Write, Read, Break, Case, Char, Const, Continue, Default, Do, Else, For,
@@ -42,7 +59,7 @@ start with INICIO;
 INICIO ::= 
     Define Identificador EXPRESION INICIO |
     Define Identificador EXPRESION PuntoComa INICIO |
-    DECLARACION INICIO |
+    DECLARACION {: parser.GuardarDeclaracionTS("Global"); :} INICIO |
     FUNCION |
     error LlaveC INICIO_B |
     error PuntoComa INICIO
@@ -59,15 +76,21 @@ INICIO_B ::=
     error PuntoComa INICIO_B
 ;
 FUNCION ::= 
-    TIPO_DATO Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC |
-    Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC |
-    TIPO_DATO Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC INICIO_B |
-    Void Identificador ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC INICIO_B
+    TIPO_DATO Identificador:v1 ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
+    parser.GuardarDeclaracionTS("Funcion"); :} |
+    Void Identificador:v1 ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.GuardarRS_Tipo("void");
+    parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
+    parser.GuardarDeclaracionTS("Funcion"); :} |
+    TIPO_DATO Identificador:v1 ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
+    parser.GuardarDeclaracionTS("Funcion"); :} INICIO_B |
+    Void Identificador:v1 ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.GuardarRS_Tipo("void");
+    parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
+    parser.GuardarDeclaracionTS("Funcion"); :} INICIO_B 
     
 ;
 SENTENCIA ::= 
-    SENTENCIA DECLARACION |
-    DECLARACION |
+    SENTENCIA DECLARACION {: parser.GuardarDeclaracionTS("Local"); :} |
+    DECLARACION {: parser.GuardarDeclaracionTS("Local"); :} |
     SENTENCIA EXPRESION PuntoComa |
     EXPRESION PuntoComa |
     SENTENCIA INSTRUCCIONES_CONTROL |
@@ -95,8 +118,10 @@ SENTENCIA ::=
     error ParentesisC
 ;
 PARAMETROS ::= 
-    TIPO_DATO Identificador |
-    PARAMETROS Coma TIPO_DATO Identificador |
+    TIPO_DATO Identificador:v1 {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
+    parser.GuardarDeclaracionTS("Parametro"); :}  |
+    PARAMETROS Coma TIPO_DATO Identificador:v1 {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
+    parser.GuardarDeclaracionTS("Parametro"); :} |
 ;
 INSTRUCCIONES_CONTROL ::= 
     Return EXPRESION PuntoComa |
@@ -119,12 +144,12 @@ DATO_PREFIX ::=
     OperadorNegacion  
 ;
 OPERADOR_BOOL ::= 
-    OperadorComparacion |
-    OperadorMenor | 
-    OperadorMayor | 
-    OperadorMayorIgual | 
-    OperadorMenorIgual |
-    OperadorDiferencia  
+    OperadorComparacion {: RESULT="=="; :} |
+    OperadorMenor {: RESULT="char"; :} | 
+    OperadorMayor {: RESULT="char"; :} | 
+    OperadorMayorIgual {: RESULT="char"; :} | 
+    OperadorMenorIgual {: RESULT="char"; :} |
+    OperadorDiferencia {: RESULT="char"; :} 
 ;
 OPERADOR_OR_AND ::= 
     OperadorOr |
@@ -138,12 +163,12 @@ OPERADOR_ASIG ::=
     OperadorAsignacionDiv 
 ;
 TIPO_DATO ::= 
-    Char |
-    Integer | 
-    Long | 
-    Short |
-    Short Integer | 
-    Long Integer 
+    Char {: parser.GuardarRS_Tipo("char"); :} |
+    Integer {: parser.GuardarRS_Tipo("int"); :} | 
+    Long {: parser.GuardarRS_Tipo("long"); :} | 
+    Short {: parser.GuardarRS_Tipo("short"); :} |
+    Short Integer {: parser.GuardarRS_Tipo("short int"); :} | 
+    Long Integer {: parser.GuardarRS_Tipo("long int"); :}
 ;
 DATO ::= 
     LiteralChar |
@@ -151,15 +176,15 @@ DATO ::=
     Identificador
 ;
 DECLARACION_LIST ::= 
-    Identificador |
-    DECLARACION_LIST Coma Identificador |
-    Identificador OperadorAsignacion OPERACION |
-    DECLARACION_LIST Coma Identificador OperadorAsignacion OPERACION
+    Identificador:v1 {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1); :} |
+    DECLARACION_LIST Coma Identificador:v1 {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1); :} |
+    Identificador:v1 OperadorAsignacion OPERACION {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1); :} |
+    DECLARACION_LIST Coma Identificador:v1 OperadorAsignacion OPERACION {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1); :}
 ;
 DECLARACION ::= 
     TIPO_DATO DECLARACION_LIST PuntoComa |
     TIPO_DATO Const DECLARACION_LIST PuntoComa |  
-    Const TIPO_DATO DECLARACION_LIST PuntoComa 
+    Const TIPO_DATO DECLARACION_LIST PuntoComa
 ;
 OPERACION ::= 
     OPERACION OPERADOR_BOOL OPERACION1 | 

@@ -1,91 +1,18 @@
-#define p ;
-int prueba = ;
-int prueba = ;
-void main(1){
-    int input, stop;
-    stop = 1;
-    while ((input = getchar()) != EOF) {
-        stop 1 =;
-        if (input == '\t' ) {
-            putchar('\\');
-            putchar('t');
-            stop = ;
-        }
-        if (input == ' ') {
-            putchar('\\');
-            putchar('b')
-            stop = 0;
-        }
-        if (input == '\\') {
-            putchar('\\');
-            putchar('\\';
-            stop = 0;
-        }
-        else {
-            if (stop == 1) {
-                printf('%c', input);
-            }
-        }
- 
-    }
-}
-#define a ;
-int prueba = 1;
-void main(2){
-    int input, stop;
-    stop = 1;
-    while ((input = getchar()) != EOF) {
-        stop 1 =;
-        if (input == '\t' ) {
-            putchar('\\');
-            putchar('t');
-            stop = ;
-        }
-        if (input == ' ') {
-            putchar('\\');
-            putchar('b')
-            stop = 0;
-        }
-        if (input == '\\') {
-            putchar('\\');
-            putchar('\\';
-            stop = 0;
-        }
-        else {
-            if (stop == 1) {
-                printf('%c', input);
-            }
-        }
- 
-    }
-}
-#define a ;
-int prueba = ;
-void main(3){
-    int input, stop;
-    stop = 1;
-    while ((input = getchar()) != EOF) {
-        stop 1 =;
-        if (input == '\t' ) {
-            putchar('\\');
-            putchar('t');
-            stop = ;
-        }
-        if (input == ' ') {
-            putchar('\\');
-            putchar('b')
-            stop = 0;
-        }
-        if (input == '\\') {
-            putchar('\\');
-            putchar('\\';
-            stop = 0;
-        }
-        else {
-            if (stop == 1) {
-                printf('%c', input);
-            }
-        }
- 
-    }
-}
+//Esta es una prueba para verificar las estructuras de control
+
+//switch, case, default, read, write
+
+
+int x = 4+5;
+int x,x = 4+5;
+int const b;
+const char c;
+long int t;
+
+void funcion1(int p){
+    int x;
+}// fin de la funcion
+
+void funcion1(int p, int c, int t){
+    int c;
+}// fin de la funcion

@@ -154,7 +154,7 @@ public class Main {
             s.parse();
             ArrayList<Symbol> sym = s.getS();
             if(sym.isEmpty()){
-                System.out.println("\u001B[32m"+"Analisis realizado correctamente"+"\u001B[32m");
+                System.out.println("\u001B[32m"+"Analisis sintactico realizado correctamente"+"\u001B[32m");
             }
             else{
                 for (int i = 0; i < s.getS().size(); i++) {
@@ -166,6 +166,9 @@ public class Main {
                 }
 
             }
+            
+            TablaSimbolos.getInstance().printTabla();
+            System.out.println(""+PilaSemantica.getInstance().Simbolos.size());
 
         } catch (Exception ex) {
             ArrayList<Symbol> sym = s.getS();
