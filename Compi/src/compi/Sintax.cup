@@ -219,16 +219,16 @@ READ ::= Read ParentesisA ParentesisC PuntoComa |
 ;
 WRITE ::= Write ParentesisA LISTA_EXPRESIONES ParentesisC PuntoComa
 ;
-IF ::= If ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC 
+IF ::= If {: System.out.println("Start if"); :} ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC 
 ;
 SENTENCIA_BOOLEANA ::= 
     OPERACION |
     Identificador OPERADOR_ASIG OPERACION |
     SENTENCIA_BOOLEANA OPERADOR_OR_AND OPERACION 
 ;
-IF_ELSE ::= If ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC Else LlaveA SENTENCIA LlaveC
+IF_ELSE ::= IF Else LlaveA SENTENCIA LlaveC
 ;
-WHILE ::= While ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC
+WHILE ::= While {: System.out.println("Start while"); :} ParentesisA SENTENCIA_BOOLEANA ParentesisC {: System.out.println("test while"); :} LlaveA SENTENCIA LlaveC {: System.out.println("end while"); :}
 ;
 DO_WHILE ::= Do LlaveA SENTENCIA LlaveC While ParentesisA SENTENCIA_BOOLEANA ParentesisC PuntoComa
 ;

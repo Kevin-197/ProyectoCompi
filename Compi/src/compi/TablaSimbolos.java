@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class TablaSimbolos {
     private ArrayList<RegistroTS> Simbolos;
     private static TablaSimbolos instance;
+    private boolean ErrorFunc;
     private int UltimaFunc;
 
     private TablaSimbolos() {
@@ -32,14 +33,24 @@ public class TablaSimbolos {
             System.out.println("\u001B[31mError semantico. Linea: " + line + " Columna: " + column +  " Ya ha sido previamente declarado el identificador \""+identificador+"\"\u001B[31m");
             if("Funcion".equals(ambito)){
                 this.DeleteFunc();
+                this.ErrorFunc = false;
+            }
+            if("Parametro".equals(ambito)){
+                this.ErrorFunc = true;
             }
         }
         else{
             RegistroTS registro = new RegistroTS(identificador, tipo, ambito);
-            if("Funcion".equals(ambito)){
-                this.UltimaFunc=Simbolos.size();
+            if("Funcion".equals(ambito) && this.ErrorFunc){
+                this.DeleteFunc();
+                this.ErrorFunc = false;
             }
-            Simbolos.add(registro);
+            else {
+                if("Funcion".equals(ambito)){
+                    this.UltimaFunc=Simbolos.size();
+                }
+                Simbolos.add(registro);
+            }
         }
         
     }
@@ -48,7 +59,7 @@ public class TablaSimbolos {
         String currentAmbito;
         RegistroTS current;
         int cont = 0;
-        if("Parametro".equals(ambito)){
+        if("Parametro".equals(ambito) || "Local".equals(ambito)){
             cont = this.UltimaFunc;
         }
         for (int i = cont; i < Simbolos.size(); i++) {
@@ -57,6 +68,25 @@ public class TablaSimbolos {
                 currentAmbito = current.getAmbito();
                 if(currentAmbito.equals(ambito)){
                     return current;
+                }
+                else if(null != ambito) switch (ambito) {
+                    case "Funcion":
+                        if("Global".equals(currentAmbito)){
+                            return current;
+                        }
+                        break;
+                    case "Global":
+                        if("Funcion".equals(currentAmbito)){
+                            return current;
+                        }
+                        break;
+                    case "Local":
+                        if("Parametro".equals(currentAmbito)){
+                            return current;
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         }

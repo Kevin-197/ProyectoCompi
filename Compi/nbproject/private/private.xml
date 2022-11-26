@@ -12,11 +12,12 @@
             <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/Sintax.cup</file>
             <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/Lexer.java</file>
             <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/LexerCup.java</file>
-            <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/archivoAnalisis.c</file>
             <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/RS_Var.java</file>
+            <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/archivoAnalisis.c</file>
             <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/Sintax.java</file>
             <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/RegistroTS.java</file>
             <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/RS_Tipo.java</file>
+            <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/LexerCup.flex</file>
             <file>file:/D:/RepoVR/ProyectoCompi/Compi/src/compi/PilaSemantica.java</file>
         </group>
     </open-files>
