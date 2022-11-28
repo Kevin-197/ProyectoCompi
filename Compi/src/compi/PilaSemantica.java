@@ -4,6 +4,8 @@
  */
 package compi;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -11,6 +13,8 @@ import java.util.ArrayList;
  * @author kevin
  */
 public class PilaSemantica {
+    
+    public String rutaEnsamblador = "D:/RepoVR/ProyectoCompi/Compi/src/compi/Esamblador.asm"; ;
     public ArrayList<RS> Simbolos;
     private static PilaSemantica instance; 
     private TablaSimbolos tabla = TablaSimbolos.getInstance();
@@ -97,31 +101,40 @@ public class PilaSemantica {
             }
         }
         for (int i = this.Simbolos.size()-1; i > cont; i--) {
-            RS_Var id = (RS_Var) this.Pop();
-            if(Ambito.equals("Global")){
-                String dato = ""; 
-                if (tipo.Tipo == "int"){
-                    dato = "dd";
+            if("RS_Var".equals(Simbolos.get(i).nombre())){
+                RS_Var id = (RS_Var) this.Pop();
+                if(Ambito.equals("Global")){
+                    String dato = ""; 
+                    if (tipo.Tipo == "int"){
+                        dato = "dd";
+                    }
+                    if(tipo.Tipo == "long"){
+                        dato = "dq";
+                    }
+                    if(tipo.Tipo == "char"){
+                        dato = "db"; 
+                    }
+                    if(tipo.Tipo == "short"){
+                        dato = "dw";
+                    }
+                    if(tipo.Tipo == "long int"){
+                        dato = "dq";
+                    }
+                    if(tipo.Tipo == "short int"){
+                        dato = "dw";
+                    }
+                    System.out.println(id.Id + "       " + dato + "        "+ "0");
+                    try{
+                        FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
+                        escritorEnsamblador.write(id.Id + "       " + dato + "        "+ "0"+  "\n");
+                        escritorEnsamblador.close();
+                    }
+                    catch (IOException e){
+                        e.printStackTrace();
+                    }
                 }
-                if(tipo.Tipo == "long"){
-                    dato = "dq";
-                }
-                if(tipo.Tipo == "char"){
-                    dato = "db"; 
-                }
-                if(tipo.Tipo == "short"){
-                    dato = "dw";
-                }
-                if(tipo.Tipo == "long int"){
-                    dato = "dq";
-                }
-                if(tipo.Tipo == "short int"){
-                    dato = "dw";
-                }
-                System.out.println(id.Id + "       " + dato + "        "+ "0");
+                this.tabla.InsertSimbolo(id.Id,tipo.Tipo,Ambito,id.Line,id.Column);
             }
-            this.tabla.InsertSimbolo(id.Id,tipo.Tipo,Ambito,id.Line,id.Column);
-
         }
 
         this.Pop();
@@ -163,6 +176,7 @@ public class PilaSemantica {
             }
         }
         return rsBuscado;
+        
     }
     
     private int getFirstParam() {
@@ -177,5 +191,31 @@ public class PilaSemantica {
             cont = i;
         }
         return cont;
+    }
+    
+    public void AddPrefix(String Val){
+        RS_DO rs_do = (RS_DO) this.Pop();
+        String temp="";
+        int valor = 0;
+        if("+".equals(Val)){
+            temp = rs_do.Valor;
+            rs_do.setValor(temp);
+        }
+        else if ("-".equals(Val)){
+           temp = "-".concat(rs_do.Valor);
+           rs_do.setValor(temp);
+        }
+        else if ("!".equals(Val)){
+            valor = rs_do.getValor();
+            if(valor>0){
+                rs_do.setValor("0");
+            }
+            else if(valor<=0){
+                rs_do.setValor("1");
+            }
+        }
+        this.Push(rs_do);
+        RS_DO rs_do2 = (RS_DO) this.Simbolos.get(this.Top()-1);
+        System.out.println(rs_do2.Valor);
     }
 }

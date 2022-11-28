@@ -24,9 +24,8 @@ parser code
 
     public TablaSimbolos tabla = TablaSimbolos.getInstance();
     public PilaSemantica pila = PilaSemantica.getInstance();
-    public int contadorWhile=0;
     public String rutaEnsamblador = "D:/RepoVR/ProyectoCompi/Compi/src/compi/Esamblador.asm";
-    public int contadorIf = 0;
+    public int contador = 0;
     
     public void GuardarRS_Tipo(String Tipo){
         RS_Tipo tipo = new RS_Tipo(Tipo);
@@ -55,43 +54,83 @@ parser code
     }
 
     public Boolean init = true; 
+    public Boolean initFunc = true; 
     public void GuardarDeclaracionTS(String Ambito){
+        if(Ambito.equals("Funcion") && initFunc == true){
+            try{
+                FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
+                escritorEnsamblador.write("\nsection .text"+  "\nglobal _start\n_start:\n\n");
+                escritorEnsamblador.close();
+            }
+            catch (IOException e){
+                e.printStackTrace();
+            }
+            initFunc = false;
+        }
         if(init == true){
             System.out.println("section .data");
+            try{
+                FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
+                escritorEnsamblador.write("section .data"+  "\n");
+                escritorEnsamblador.close();
+            }
+            catch (IOException e){
+                e.printStackTrace();
+            }
             init = false;
         }
         this.pila.GuardarVariable(Ambito);
-
     }
-    
+
     public void StartWhile(){
-        String label1 =  "while_label" + Integer.toString(this.contadorWhile);
-        String label2 =  "exit_label" + Integer.toString(this.contadorWhile); 
-        RS_While rs_while = new RS_While(label1,label2);
-        System.out.println(rs_while.label1 + ":");
-        this.pila.Push(rs_while);
-        this.contadorWhile++;
+        try{
+            FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
+            String label1 =  "while_label" + Integer.toString(this.contador);
+            String label2 =  "exit_label" + Integer.toString(this.contador); 
+            RS_While rs_while = new RS_While(label1,label2);
+            escritorEnsamblador.write("\n"+rs_while.label1 + ":" + "\n");
+            escritorEnsamblador.close();
+            this.pila.Push(rs_while);
+            this.contador++;
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     public void TestWhile(){
-        System.out.println("POP RS_DO");
-        System.out.println("CODIGO EVALUACION");
-        RS_While rs_while = pila.BuscarRS_While();
-        System.out.println("jmp " + rs_while.label2);
+        try{
+            FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
+            System.out.println("POP RS_DO");
+            System.out.println("CODIGO EVALUACION");
+            RS_While rs_while = pila.BuscarRS_While();
+            escritorEnsamblador.write("jmp " + rs_while.label2 + "\n");
+            escritorEnsamblador.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     public void EndWhile(){
-        RS_While rs_while = pila.BuscarRS_While();
-        System.out.println("jmp " + rs_while.label1);
-        System.out.println(rs_while.label2 + ":");
-        this.pila.Pop();
+        try{
+            FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
+            RS_While rs_while = pila.BuscarRS_While();
+            escritorEnsamblador.write("jmp " + rs_while.label1 + "\n");
+            escritorEnsamblador.write("\n"+rs_while.label2 + ":" + "\n");
+            escritorEnsamblador.close();
+            this.pila.Pop();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     public void StartIf(String Else_label, String Exit_label){
         System.out.println("Start If");
-        RS_If if_else = new RS_If(Else_label,Exit_label,contadorIf);
+        RS_If if_else = new RS_If(Else_label,Exit_label,contador);
         this.pila.Push(if_else);
-        contadorIf++;
+        this.contador++;
     }
 
     public void TestIf(){
@@ -117,7 +156,7 @@ parser code
             System.out.println("Start Else");
             RS_If if_else = this.pila.BuscarRSIf();
             escritorEnsamblador.write("jmp " + if_else.Exit_label + "\n");
-            escritorEnsamblador.write(if_else.Else_label + ":" + "\n");
+            escritorEnsamblador.write("\n"+if_else.Else_label + ":" + "\n");
             escritorEnsamblador.close();
         }
         catch (IOException e){
@@ -125,12 +164,40 @@ parser code
         }
     }
 
+    public void RecuerdaConstante(String Valor, String Tipo){
+        int val = 0;
+        if(Tipo=="Numero"){
+           val = Integer.parseInt(Valor);
+        }
+        else if(Tipo=="Char"){
+           val = Valor.toString().charAt(1);
+        } 
+        RS_DO rs_do = new RS_DO(Tipo,val+"");
+        this.pila.Push(rs_do);
+        System.out.println(val+"");
+    }
+
+    public void AddPrefix(String val){
+        this.pila.AddPrefix(val);
+    }
+    
+    public void RecuerdaOP(String Valor){
+        RS_Operador rs_op = new RS_Operador(Valor);
+        this.pila.Push(rs_op);
+        System.out.println(Valor);
+    }
+    public void RecuerdaVariable(String Valor, String Tipo){ 
+        RS_DO rs_do = new RS_DO(Tipo,Valor);
+        this.pila.Push(rs_do);
+        System.out.println(Valor);
+    }
+
     public void EndIf(){
         try{
             FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
             System.out.println("End If");
             RS_If if_else = this.pila.BuscarRSIf();
-            escritorEnsamblador.write(if_else.Exit_label + ":" + "\n");
+            escritorEnsamblador.write("\n"+if_else.Exit_label + ":" + "\n");
             escritorEnsamblador.close();
             this.pila.Pop();
         }
@@ -233,37 +300,37 @@ INSTRUCCIONES_CONTROL ::=
     Continue PuntoComa
 ;
 OPERADOR_ARITMETICO2 ::= 
-    OperadorMulti |
-    OperadorDiv | 
-    OperadorMod
+    OperadorMulti:v1 {: parser.RecuerdaOP(v1.toString()); :} |
+    OperadorDiv:v1 {: parser.RecuerdaOP(v1.toString()); :}  | 
+    OperadorMod:v1 {: parser.RecuerdaOP(v1.toString()); :} 
 ;
 OPERADOR_ARITMETICO1 ::= 
-    OperadorSuma | 
-    OperadorResta 
+    OperadorSuma:v1 {: parser.RecuerdaOP(v1.toString()); :}  | 
+    OperadorResta:v1 {: parser.RecuerdaOP(v1.toString()); :}  
 ;
 DATO_PREFIX ::= 
-    OperadorSuma | 
-    OperadorResta |
-    OperadorNegacion  
+    OperadorSuma:v1 {: RESULT=v1.toString(); :} | 
+    OperadorResta:v1 {: RESULT=v1.toString(); :} |
+    OperadorNegacion:v1 {: RESULT=v1.toString(); :} 
 ;
 OPERADOR_BOOL ::= 
-    OperadorComparacion {: RESULT="=="; :} |
-    OperadorMenor {: RESULT="char"; :} | 
-    OperadorMayor {: RESULT="char"; :} | 
-    OperadorMayorIgual {: RESULT="char"; :} | 
-    OperadorMenorIgual {: RESULT="char"; :} |
-    OperadorDiferencia {: RESULT="char"; :} 
+    OperadorComparacion:v1 {: parser.RecuerdaOP(v1.toString()); :}  |
+    OperadorMenor:v1 {: parser.RecuerdaOP(v1.toString()); :}  | 
+    OperadorMayor:v1 {: parser.RecuerdaOP(v1.toString()); :}  | 
+    OperadorMayorIgual:v1 {: parser.RecuerdaOP(v1.toString()); :}  | 
+    OperadorMenorIgual:v1 {: parser.RecuerdaOP(v1.toString()); :}  |
+    OperadorDiferencia:v1 {: parser.RecuerdaOP(v1.toString()); :}
 ;
 OPERADOR_OR_AND ::= 
-    OperadorOr |
-    OperadorAnd 
+    OperadorOr:v1 {: parser.RecuerdaOP(v1.toString()); :}  |
+    OperadorAnd:v1 {: parser.RecuerdaOP(v1.toString()); :}  
 ;
 OPERADOR_ASIG ::= 
-    OperadorAsignacion |
-    OperadorAsignacionSuma | 
-    OperadorAsignacionResta | 
-    OperadorAsignacionMul |
-    OperadorAsignacionDiv 
+    OperadorAsignacion:v1 {: parser.RecuerdaOP(v1.toString()); :}  |
+    OperadorAsignacionSuma:v1 {: parser.RecuerdaOP(v1.toString()); :}  | 
+    OperadorAsignacionResta:v1 {: parser.RecuerdaOP(v1.toString()); :}  | 
+    OperadorAsignacionMul:v1 {: parser.RecuerdaOP(v1.toString()); :}  |
+    OperadorAsignacionDiv:v1 {: parser.RecuerdaOP(v1.toString()); :}  
 ;
 TIPO_DATO ::= 
     Char {: parser.GuardarRS_Tipo("char"); :} |
@@ -274,9 +341,10 @@ TIPO_DATO ::=
     Long Integer {: parser.GuardarRS_Tipo("long int"); :}
 ;
 DATO ::= 
-    LiteralChar |
-    Int |
-    Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :}
+    LiteralChar:v1 {: parser.RecuerdaConstante(v1.toString(),"Char"); :} |
+    Int:v1 {: parser.RecuerdaConstante(v1.toString(),"Numero"); :} |
+    Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); :}
 ;
 DECLARACION_LIST ::= 
     Identificador:v1 {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1); :} |
@@ -290,31 +358,36 @@ DECLARACION ::=
     Const TIPO_DATO DECLARACION_LIST PuntoComa
 ;
 OPERACION ::= 
-    OPERACION OPERADOR_BOOL OPERACION1 | 
+    OPERACION OPERADOR_BOOL OPERACION1 {: System.out.println("Eval OP"); :} | 
     OPERACION1
 ;
 OPERACION1 ::= 
-    OPERACION1 OPERADOR_ARITMETICO1 OPERACION2 | 
+    OPERACION1 OPERADOR_ARITMETICO1 OPERACION2 {: System.out.println("Eval OP1"); :} | 
     OPERACION2
 ;
 OPERACION2 ::= 
-    OPERACION2 OPERADOR_ARITMETICO2 FACTOR | 
+    OPERACION2 OPERADOR_ARITMETICO2 FACTOR {: System.out.println("Eval OP2"); :} | 
     FACTOR
 ;
 FACTOR ::= 
     ParentesisA EXPRESION ParentesisC | 
     DATO_PREFIX ParentesisA EXPRESION ParentesisC | 
-    DATO_PREFIX DATO |
+    DATO_PREFIX:v1 DATO {: parser.AddPrefix(v1.toString()); :} |
     DATO |
-    OperadorDecremento Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :} |
-    OperadorIncremento Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :} |
-    Identificador:v1 OperadorDecremento {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :} |
-    Identificador:v1 OperadorIncremento {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :} |
+    OperadorDecremento Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} |
+    OperadorIncremento Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} |
+    Identificador:v1 OperadorDecremento {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} |
+    Identificador:v1 OperadorIncremento {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} |
     Identificador:v1 ParentesisA LISTA_IDENTIFICADORES ParentesisC {: parser.ValidarLlamadaFunc(v1.toString(),v1right +1,v1left +1); :} |
     Identificador:v1 ParentesisA ParentesisC {: parser.ValidarLlamadaFunc(v1.toString(),v1right +1,v1left +1); :}
 ;
 EXPRESION ::= 
-    Identificador:v1 OPERADOR_ASIG OPERACION {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :} |
+    Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} OPERADOR_ASIG OPERACION {: System.out.println("Eval OPAsig"); :} |
     OPERACION 
 ;
 READ ::= Read ParentesisA ParentesisC PuntoComa |
@@ -326,7 +399,8 @@ IF ::= If {: parser.StartIf("else_label","exit_label"); :} ParentesisA SENTENCIA
 ;
 SENTENCIA_BOOLEANA ::= 
     OPERACION |
-    Identificador:v1 OPERADOR_ASIG OPERACION {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :}|
+    Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} OPERADOR_ASIG OPERACION {: System.out.println("Eval OPAsig"); :} |
     SENTENCIA_BOOLEANA OPERADOR_OR_AND OPERACION 
 ;
 IF_ELSE ::= IF Else {: parser.StartElse(); :} LlaveA SENTENCIA LlaveC {: parser.EndIf(); :}

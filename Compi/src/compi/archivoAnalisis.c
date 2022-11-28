@@ -1,17 +1,21 @@
 
-int x = 4+5;
-int x,x = 4+5;
-int const a;
+int x;
+int x;
+int const a= 4+'Hola';
 int asdasd;
 const char c;
-long t;
+long int t;
 short c; 
 
 void funcion1(int x, char t, long int c){
     int aaaaaaa;
     a+zz*m;
-    if(x!=4){
-        x=5;
+    x=5+6;
+    5=4;
+    if(x=!4+5){
+        4*5-(5+4)*1==a;
+        5+ -7;
+        5+ +5;
     }
     else{
         x++;
@@ -26,7 +30,7 @@ void x(int p, int c){
     while(aaaaaaa=3){
         if(a==x){
             
-            int pruebawhile = 4;
+            int pruebawhile;
         }
         else{
             x;

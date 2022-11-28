@@ -150,6 +150,14 @@ public class Main {
         String archivoAnalisis = new String(Files.readAllBytes(archivo.toPath()));
         Sintax s = new Sintax(new LexerCup(new StringReader(archivoAnalisis)));
         System.out.println("\n\n-----------------------------------\n\n");
+        String rutaEnsamblador = "D:/RepoVR/ProyectoCompi/Compi/src/compi/Esamblador.asm";
+        try{
+            FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,false);
+            escritorEnsamblador.write("");
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
         try {
             s.parse();
             ArrayList<Symbol> sym = s.getS();
