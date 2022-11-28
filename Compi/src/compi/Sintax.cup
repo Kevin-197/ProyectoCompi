@@ -2,6 +2,8 @@ package compi;
 
 import java_cup.runtime.Symbol;
 import java.util.ArrayList;
+import java.io.FileWriter;
+import java.io.IOException;
 
 parser code
 {:
@@ -22,6 +24,9 @@ parser code
 
     public TablaSimbolos tabla = TablaSimbolos.getInstance();
     public PilaSemantica pila = PilaSemantica.getInstance();
+    public int contadorWhile=0;
+    public String rutaEnsamblador = "D:/RepoVR/ProyectoCompi/Compi/src/compi/Esamblador.asm";
+    public int contadorIf = 0;
     
     public void GuardarRS_Tipo(String Tipo){
         RS_Tipo tipo = new RS_Tipo(Tipo);
@@ -32,10 +37,108 @@ parser code
         RS_Var var = new RS_Var(Id,Line,Column);
         this.pila.Push(var);
     }
-
-    public void GuardarDeclaracionTS(String Ambito){
-        this.pila.GuardarVariable(Ambito);
+    
+    public void GuardarRS_Param(String Id, int Line, int Column){
+        RS_Param param = new RS_Param(Id,Line,Column);
+        this.pila.Push(param);
     }
+
+    public void BuscarSimbolo(String Id, int Line, int Column, String Ambito){
+        RegistroTS a = this.tabla.BuscarSimboloDeclarado(Id, Ambito);
+        if(a==null){
+            System.out.println("\u001B[31mError semantico. Linea: " + Line + " Columna: " + Column +  " No ha sido declarado el identificador \""+Id+"\"\u001B[31m");
+        }
+    }
+    
+    public void ValidarLlamadaFunc(String Id, int Line, int Column){
+        this.pila.ValidarLlamadaFunc(Id, Line, Column);
+    }
+
+    public Boolean init = true; 
+    public void GuardarDeclaracionTS(String Ambito){
+        if(init == true){
+            System.out.println("section .data");
+            init = false;
+        }
+        this.pila.GuardarVariable(Ambito);
+
+    }
+    
+    public void StartWhile(){
+        String label1 =  "while_label" + Integer.toString(this.contadorWhile);
+        String label2 =  "exit_label" + Integer.toString(this.contadorWhile); 
+        RS_While rs_while = new RS_While(label1,label2);
+        System.out.println(rs_while.label1 + ":");
+        this.pila.Push(rs_while);
+        this.contadorWhile++;
+    }
+
+    public void TestWhile(){
+        System.out.println("POP RS_DO");
+        System.out.println("CODIGO EVALUACION");
+        RS_While rs_while = pila.BuscarRS_While();
+        System.out.println("jmp " + rs_while.label2);
+    }
+
+    public void EndWhile(){
+        RS_While rs_while = pila.BuscarRS_While();
+        System.out.println("jmp " + rs_while.label1);
+        System.out.println(rs_while.label2 + ":");
+        this.pila.Pop();
+    }
+
+    public void StartIf(String Else_label, String Exit_label){
+        System.out.println("Start If");
+        RS_If if_else = new RS_If(Else_label,Exit_label,contadorIf);
+        this.pila.Push(if_else);
+        contadorIf++;
+    }
+
+    public void TestIf(){
+        try{
+
+            FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
+            System.out.println();
+            System.out.println("Test If");
+            System.out.println("Pop(RS_DO)");
+            System.out.println("Evaluar la expresion");
+            RS_If if_else = this.pila.BuscarRSIf();
+            escritorEnsamblador.write("jg " + if_else.Else_label + "\n");
+            escritorEnsamblador.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void StartElse(){
+        try{
+            FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
+            System.out.println("Start Else");
+            RS_If if_else = this.pila.BuscarRSIf();
+            escritorEnsamblador.write("jmp " + if_else.Exit_label + "\n");
+            escritorEnsamblador.write(if_else.Else_label + ":" + "\n");
+            escritorEnsamblador.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void EndIf(){
+        try{
+            FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
+            System.out.println("End If");
+            RS_If if_else = this.pila.BuscarRSIf();
+            escritorEnsamblador.write(if_else.Exit_label + ":" + "\n");
+            escritorEnsamblador.close();
+            this.pila.Pop();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
 :};
 
 terminal Define, Write, Read, Break, Case, Char, Const, Continue, Default, Do, Else, For,
@@ -52,7 +155,7 @@ non terminal FUNCION, SENTENCIA, PARAMETROS, OPERADOR_ARITMETICO2, OPERADOR_ARIT
     DECLARACION_LIST, DECLARACION, OPERACION, OPERACION1, OPERACION2, FACTOR, EXPRESION, IF, IF_ELSE,
     INSTRUCCIONES_CONTROL, WHILE, DO_WHILE, SENTENCIA_BOOLEANA, SENTENCIA_FOR, LISTA_EXPRESIONES, FOR,
     READ, WRITE, LISTA_IDENTIFICADORES, INICIO, INICIO_B, SWITCH, ETIQUETA_SWITCH, OPERACION_SWITCH1,
-    OPERACION_SWITCH2, CONSTANT_FACTOR;
+    OPERACION_SWITCH2, CONSTANT_FACTOR, NOMBRE_FUNCION, TIPO_DATO_FUNCION;
 
 start with INICIO;
 
@@ -67,27 +170,27 @@ INICIO ::=
 INICIO_B ::= 
     Define Identificador EXPRESION INICIO_B  |
     Define Identificador EXPRESION PuntoComa INICIO_B  |
-    DECLARACION INICIO_B |
+    DECLARACION {: parser.GuardarDeclaracionTS("Global"); :} INICIO_B |
     Define Identificador EXPRESION |
     Define Identificador EXPRESION PuntoComa |
-    DECLARACION |
+    DECLARACION {: parser.GuardarDeclaracionTS("Global"); :} |
     FUNCION |
     error LlaveC INICIO_B |
     error PuntoComa INICIO_B
 ;
 FUNCION ::= 
-    TIPO_DATO Identificador:v1 ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
-    parser.GuardarDeclaracionTS("Funcion"); :} |
-    Void Identificador:v1 ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.GuardarRS_Tipo("void");
-    parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
-    parser.GuardarDeclaracionTS("Funcion"); :} |
-    TIPO_DATO Identificador:v1 ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
-    parser.GuardarDeclaracionTS("Funcion"); :} INICIO_B |
-    Void Identificador:v1 ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.GuardarRS_Tipo("void");
-    parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
-    parser.GuardarDeclaracionTS("Funcion"); :} INICIO_B 
-    
+    TIPO_DATO NOMBRE_FUNCION ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.tabla.TerminaFuncion(); :} |
+    TIPO_DATO_FUNCION NOMBRE_FUNCION ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.tabla.TerminaFuncion(); :} |
+    TIPO_DATO NOMBRE_FUNCION ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.tabla.TerminaFuncion(); :} INICIO_B |
+    TIPO_DATO_FUNCION NOMBRE_FUNCION ParentesisA PARAMETROS ParentesisC LlaveA SENTENCIA LlaveC {: parser.tabla.TerminaFuncion(); :} INICIO_B 
 ;
+TIPO_DATO_FUNCION ::= 
+    Void {: parser.GuardarRS_Tipo("void"); :}
+;
+NOMBRE_FUNCION ::=
+    Identificador:v1 {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1);
+    parser.GuardarDeclaracionTS("Funcion"); :}
+; 
 SENTENCIA ::= 
     SENTENCIA DECLARACION {: parser.GuardarDeclaracionTS("Local"); :} |
     DECLARACION {: parser.GuardarDeclaracionTS("Local"); :} |
@@ -173,7 +276,7 @@ TIPO_DATO ::=
 DATO ::= 
     LiteralChar |
     Int |
-    Identificador
+    Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :}
 ;
 DECLARACION_LIST ::= 
     Identificador:v1 {: parser.GuardarRS_Var(v1.toString(),v1right +1,v1left +1); :} |
@@ -203,15 +306,15 @@ FACTOR ::=
     DATO_PREFIX ParentesisA EXPRESION ParentesisC | 
     DATO_PREFIX DATO |
     DATO |
-    OperadorDecremento Identificador |
-    OperadorIncremento Identificador |
-    Identificador OperadorDecremento |
-    Identificador OperadorIncremento |
-    Identificador ParentesisA LISTA_EXPRESIONES ParentesisC |
-    Identificador ParentesisA ParentesisC
+    OperadorDecremento Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :} |
+    OperadorIncremento Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :} |
+    Identificador:v1 OperadorDecremento {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :} |
+    Identificador:v1 OperadorIncremento {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :} |
+    Identificador:v1 ParentesisA LISTA_IDENTIFICADORES ParentesisC {: parser.ValidarLlamadaFunc(v1.toString(),v1right +1,v1left +1); :} |
+    Identificador:v1 ParentesisA ParentesisC {: parser.ValidarLlamadaFunc(v1.toString(),v1right +1,v1left +1); :}
 ;
 EXPRESION ::= 
-    Identificador OPERADOR_ASIG OPERACION |
+    Identificador:v1 OPERADOR_ASIG OPERACION {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :} |
     OPERACION 
 ;
 READ ::= Read ParentesisA ParentesisC PuntoComa |
@@ -219,16 +322,16 @@ READ ::= Read ParentesisA ParentesisC PuntoComa |
 ;
 WRITE ::= Write ParentesisA LISTA_EXPRESIONES ParentesisC PuntoComa
 ;
-IF ::= If {: System.out.println("Start if"); :} ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA SENTENCIA LlaveC 
+IF ::= If {: parser.StartIf("else_label","exit_label"); :} ParentesisA SENTENCIA_BOOLEANA ParentesisC {: parser.TestIf(); :} LlaveA SENTENCIA LlaveC
 ;
 SENTENCIA_BOOLEANA ::= 
     OPERACION |
-    Identificador OPERADOR_ASIG OPERACION |
+    Identificador:v1 OPERADOR_ASIG OPERACION {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); :}|
     SENTENCIA_BOOLEANA OPERADOR_OR_AND OPERACION 
 ;
-IF_ELSE ::= IF Else LlaveA SENTENCIA LlaveC
+IF_ELSE ::= IF Else {: parser.StartElse(); :} LlaveA SENTENCIA LlaveC {: parser.EndIf(); :}
 ;
-WHILE ::= While {: System.out.println("Start while"); :} ParentesisA SENTENCIA_BOOLEANA ParentesisC {: System.out.println("test while"); :} LlaveA SENTENCIA LlaveC {: System.out.println("end while"); :}
+WHILE ::= While {: parser.StartWhile(); :} ParentesisA SENTENCIA_BOOLEANA ParentesisC {: parser.TestWhile(); :} LlaveA SENTENCIA LlaveC {: parser.EndWhile(); :}
 ;
 DO_WHILE ::= Do LlaveA SENTENCIA LlaveC While ParentesisA SENTENCIA_BOOLEANA ParentesisC PuntoComa
 ;
@@ -269,6 +372,8 @@ LISTA_EXPRESIONES ::=
     LISTA_EXPRESIONES Coma EXPRESION  
 ;
 LISTA_IDENTIFICADORES ::= 
-    Identificador |
-    DECLARACION_LIST Coma Identificador
+    Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
+    parser.GuardarRS_Param(v1.toString(),v1right +1,v1left +1); :} |
+    LISTA_IDENTIFICADORES Coma Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
+    parser.GuardarRS_Param(v1.toString(),v1right +1,v1left +1); :}
 ;
