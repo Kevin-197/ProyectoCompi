@@ -150,7 +150,7 @@ public class Main {
         String archivoAnalisis = new String(Files.readAllBytes(archivo.toPath()));
         Sintax s = new Sintax(new LexerCup(new StringReader(archivoAnalisis)));
         System.out.println("\n\n-----------------------------------\n\n");
-        String rutaEnsamblador = "D:/RepoVR/ProyectoCompi/Compi/src/compi/Esamblador.asm";
+        String rutaEnsamblador = "D:/RepoVR/ProyectoCompi/Compi/src/compi/archivoAnalisis.asm";
         try{
             FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,false);
             escritorEnsamblador.write("");
@@ -176,7 +176,7 @@ public class Main {
             }
             
             TablaSimbolos.getInstance().printTabla();
-            System.out.println(""+PilaSemantica.getInstance().Simbolos.size());
+            
 
         } catch (Exception ex) {
             ArrayList<Symbol> sym = s.getS();
@@ -186,6 +186,8 @@ public class Main {
                 }
                 System.out.println("\u001B[31m"+"Error de sintaxis. Linea: " + (sym.get(i).right + 1) + " Columna: " + (sym.get(i).left + 1) + ", Caracter del error: \"" + sym.get(i).value + "\"\n"+"\u001B[31m");
             }
+            TablaSimbolos.getInstance().printTabla();
+            
         }
     }
     

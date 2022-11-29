@@ -24,8 +24,10 @@ parser code
 
     public TablaSimbolos tabla = TablaSimbolos.getInstance();
     public PilaSemantica pila = PilaSemantica.getInstance();
-    public String rutaEnsamblador = "D:/RepoVR/ProyectoCompi/Compi/src/compi/Esamblador.asm";
+    public String rutaEnsamblador = "D:/RepoVR/ProyectoCompi/Compi/src/compi/archivoAnalisis.asm";
     public int contador = 0;
+    public int contadorBreak = 0;
+    public int contadorContinue = 0;
     
     public void GuardarRS_Tipo(String Tipo){
         RS_Tipo tipo = new RS_Tipo(Tipo);
@@ -68,7 +70,6 @@ parser code
             initFunc = false;
         }
         if(init == true){
-            System.out.println("section .data");
             try{
                 FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
                 escritorEnsamblador.write("section .data"+  "\n");
@@ -83,6 +84,8 @@ parser code
     }
 
     public void StartWhile(){
+        this.contadorBreak++;
+        this.contadorContinue++;
         try{
             FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
             String label1 =  "while_label" + Integer.toString(this.contador);
@@ -101,10 +104,9 @@ parser code
     public void TestWhile(){
         try{
             FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
-            System.out.println("POP RS_DO");
-            System.out.println("CODIGO EVALUACION");
+            RS_DO exp = (RS_DO) this.pila.Pop();
             RS_While rs_while = pila.BuscarRS_While();
-            escritorEnsamblador.write("jmp " + rs_while.label2 + "\n");
+            escritorEnsamblador.write(exp.Valor+" " + rs_while.label2 + "\n");
             escritorEnsamblador.close();
         }
         catch (IOException e){
@@ -113,21 +115,34 @@ parser code
     }
 
     public void EndWhile(){
+        this.contadorBreak--;
+        this.contadorContinue--;
         try{
             FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
             RS_While rs_while = pila.BuscarRS_While();
             escritorEnsamblador.write("jmp " + rs_while.label1 + "\n");
             escritorEnsamblador.write("\n"+rs_while.label2 + ":" + "\n");
             escritorEnsamblador.close();
-            this.pila.Pop();
+            this.pila.EndWhile();
         }
         catch (IOException e){
             e.printStackTrace();
         }
     }
 
+    public void ValidarBreak(int Line, int Column){
+        if(contadorBreak <= 0){
+            System.out.println("\u001B[31mError semantico. Linea: " + Line + " Columna: " + Column +  " El break no se encuentra en una estructura de control valida\u001B[31m");
+        }
+    }
+    
+    public void ValidarContinue(int Line, int Column){
+        if(contadorContinue <= 0){
+            System.out.println("\u001B[31mError semantico. Linea: " + Line + " Columna: " + Column +  " El continue no se encuentra en una estructura de control valida\u001B[31m");
+        }
+    }
+
     public void StartIf(String Else_label, String Exit_label){
-        System.out.println("Start If");
         RS_If if_else = new RS_If(Else_label,Exit_label,contador);
         this.pila.Push(if_else);
         this.contador++;
@@ -137,12 +152,9 @@ parser code
         try{
 
             FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
-            System.out.println();
-            System.out.println("Test If");
-            System.out.println("Pop(RS_DO)");
-            System.out.println("Evaluar la expresion");
+            RS_DO exp = (RS_DO) this.pila.Pop();
             RS_If if_else = this.pila.BuscarRSIf();
-            escritorEnsamblador.write("jg " + if_else.Else_label + "\n");
+            escritorEnsamblador.write(exp.Valor+" " + if_else.Else_label + "\n");
             escritorEnsamblador.close();
         }
         catch (IOException e){
@@ -153,7 +165,6 @@ parser code
     public void StartElse(){
         try{
             FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
-            System.out.println("Start Else");
             RS_If if_else = this.pila.BuscarRSIf();
             escritorEnsamblador.write("jmp " + if_else.Exit_label + "\n");
             escritorEnsamblador.write("\n"+if_else.Else_label + ":" + "\n");
@@ -174,7 +185,6 @@ parser code
         } 
         RS_DO rs_do = new RS_DO(Tipo,val+"");
         this.pila.Push(rs_do);
-        System.out.println(val+"");
     }
 
     public void AddPrefix(String val){
@@ -184,22 +194,25 @@ parser code
     public void RecuerdaOP(String Valor){
         RS_Operador rs_op = new RS_Operador(Valor);
         this.pila.Push(rs_op);
-        System.out.println(Valor);
     }
     public void RecuerdaVariable(String Valor, String Tipo){ 
-        RS_DO rs_do = new RS_DO(Tipo,Valor);
+        RS_DO rs_do = new RS_DO(Tipo,"["+Valor+"]");
         this.pila.Push(rs_do);
-        System.out.println(Valor);
+    }
+    public void EvalOP(){ 
+        this.pila.EvalOP();
+    }
+    public void EvalOPUnaria(int op){ 
+        this.pila.EvalOPUnaria(op);
     }
 
     public void EndIf(){
         try{
             FileWriter escritorEnsamblador = new FileWriter(rutaEnsamblador,true);
-            System.out.println("End If");
             RS_If if_else = this.pila.BuscarRSIf();
             escritorEnsamblador.write("\n"+if_else.Exit_label + ":" + "\n");
             escritorEnsamblador.close();
-            this.pila.Pop();
+            this.pila.EndIf();
         }
         catch (IOException e){
             e.printStackTrace();
@@ -296,8 +309,8 @@ PARAMETROS ::=
 INSTRUCCIONES_CONTROL ::= 
     Return EXPRESION PuntoComa |
     Return PuntoComa |
-    Break PuntoComa |
-    Continue PuntoComa
+    Break PuntoComa:v1 {: parser.ValidarBreak(v1right +1,v1left +1); :} |
+    Continue PuntoComa:v1 {: parser.ValidarContinue(v1right +1,v1left +1); :}
 ;
 OPERADOR_ARITMETICO2 ::= 
     OperadorMulti:v1 {: parser.RecuerdaOP(v1.toString()); :} |
@@ -358,15 +371,15 @@ DECLARACION ::=
     Const TIPO_DATO DECLARACION_LIST PuntoComa
 ;
 OPERACION ::= 
-    OPERACION OPERADOR_BOOL OPERACION1 {: System.out.println("Eval OP"); :} | 
+    OPERACION OPERADOR_BOOL OPERACION1 {: parser.EvalOP(); :} | 
     OPERACION1
 ;
 OPERACION1 ::= 
-    OPERACION1 OPERADOR_ARITMETICO1 OPERACION2 {: System.out.println("Eval OP1"); :} | 
+    OPERACION1 OPERADOR_ARITMETICO1 OPERACION2 {: parser.EvalOP(); :} | 
     OPERACION2
 ;
 OPERACION2 ::= 
-    OPERACION2 OPERADOR_ARITMETICO2 FACTOR {: System.out.println("Eval OP2"); :} | 
+    OPERACION2 OPERADOR_ARITMETICO2 FACTOR {: parser.EvalOP(); :} | 
     FACTOR
 ;
 FACTOR ::= 
@@ -375,19 +388,19 @@ FACTOR ::=
     DATO_PREFIX:v1 DATO {: parser.AddPrefix(v1.toString()); :} |
     DATO |
     OperadorDecremento Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
-    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} |
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); parser.EvalOPUnaria(2); :} |
     OperadorIncremento Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
-    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} |
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); parser.EvalOPUnaria(1); :} |
     Identificador:v1 OperadorDecremento {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
-    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} |
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); parser.EvalOPUnaria(2); :} |
     Identificador:v1 OperadorIncremento {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
-    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} |
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); parser.EvalOPUnaria(1); :} |
     Identificador:v1 ParentesisA LISTA_IDENTIFICADORES ParentesisC {: parser.ValidarLlamadaFunc(v1.toString(),v1right +1,v1left +1); :} |
     Identificador:v1 ParentesisA ParentesisC {: parser.ValidarLlamadaFunc(v1.toString(),v1right +1,v1left +1); :}
 ;
 EXPRESION ::= 
     Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
-    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} OPERADOR_ASIG OPERACION {: System.out.println("Eval OPAsig"); :} |
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} OPERADOR_ASIG OPERACION {: parser.EvalOP(); :} |
     OPERACION 
 ;
 READ ::= Read ParentesisA ParentesisC PuntoComa |
@@ -400,22 +413,26 @@ IF ::= If {: parser.StartIf("else_label","exit_label"); :} ParentesisA SENTENCIA
 SENTENCIA_BOOLEANA ::= 
     OPERACION |
     Identificador:v1 {: parser.BuscarSimbolo(v1.toString(),v1right +1,v1left +1, "Local"); 
-    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} OPERADOR_ASIG OPERACION {: System.out.println("Eval OPAsig"); :} |
+    parser.RecuerdaVariable(v1.toString(),"Direccion"); :} OPERADOR_ASIG OPERACION |
     SENTENCIA_BOOLEANA OPERADOR_OR_AND OPERACION 
 ;
 IF_ELSE ::= IF Else {: parser.StartElse(); :} LlaveA SENTENCIA LlaveC {: parser.EndIf(); :}
 ;
 WHILE ::= While {: parser.StartWhile(); :} ParentesisA SENTENCIA_BOOLEANA ParentesisC {: parser.TestWhile(); :} LlaveA SENTENCIA LlaveC {: parser.EndWhile(); :}
 ;
-DO_WHILE ::= Do LlaveA SENTENCIA LlaveC While ParentesisA SENTENCIA_BOOLEANA ParentesisC PuntoComa
+DO_WHILE ::= Do {: parser.contadorBreak++;
+    parser.contadorContinue++; :} LlaveA SENTENCIA LlaveC While ParentesisA SENTENCIA_BOOLEANA ParentesisC PuntoComa {: parser.contadorBreak--;
+    parser.contadorContinue--; :}
 ;
-FOR ::= For ParentesisA SENTENCIA_FOR ParentesisC LlaveA SENTENCIA LlaveC
+FOR ::= For {: parser.contadorBreak++;
+    parser.contadorContinue++; :} ParentesisA SENTENCIA_FOR ParentesisC LlaveA SENTENCIA LlaveC {: parser.contadorBreak--;
+    parser.contadorContinue--; :}
 ;
 SENTENCIA_FOR ::=
     TIPO_DATO DECLARACION_LIST PuntoComa SENTENCIA_BOOLEANA PuntoComa LISTA_EXPRESIONES |
     DECLARACION_LIST PuntoComa SENTENCIA_BOOLEANA PuntoComa LISTA_EXPRESIONES
 ;
-SWITCH ::= Switch ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA ETIQUETA_SWITCH LlaveC
+SWITCH ::= Switch {: parser.contadorBreak++; :} ParentesisA SENTENCIA_BOOLEANA ParentesisC LlaveA ETIQUETA_SWITCH LlaveC {: parser.contadorBreak--; :}
 ;
 ETIQUETA_SWITCH ::=
     ETIQUETA_SWITCH Case OPERACION_SWITCH1 DosPuntos SENTENCIA |
