@@ -367,32 +367,32 @@ public class PilaSemantica {
                     break;
                 case "==":
                     operacion = "mov rax, "+rs_do1.Valor+"\n"+
-                    "comp rax, "+rs_do2.Valor+"\n";
+                    "cmp rax, "+rs_do2.Valor+"\n";
                     direccion = "JNE";
                     break;
                 case "<":
                     operacion = "mov rax, "+rs_do1.Valor+"\n"+
-                    "comp rax, "+rs_do2.Valor+"\n";
+                    "cmp rax, "+rs_do2.Valor+"\n";
                     direccion = "JNLE";
                     break;
                 case ">":
                     operacion = "mov rax, "+rs_do1.Valor+"\n"+
-                    "comp rax, "+rs_do2.Valor+"\n";
+                    "cmp rax, "+rs_do2.Valor+"\n";
                     direccion = "JNGE";
                     break;
                 case ">=":
                     operacion = "mov rax, "+rs_do1.Valor+"\n"+
-                    "comp rax, "+rs_do2.Valor+"\n";
+                    "cmp rax, "+rs_do2.Valor+"\n";
                     direccion = "JL";
                     break;
                 case "<=":
                     operacion = "mov rax, "+rs_do1.Valor+"\n"+
-                    "comp rax, "+rs_do2.Valor+"\n";
+                    "cmp rax, "+rs_do2.Valor+"\n";
                     direccion = "JG";
                     break;
                 case "!=":
                     operacion = "mov rax, "+rs_do1.Valor+"\n"+
-                    "comp rax, "+rs_do2.Valor+"\n";
+                    "cmp rax, "+rs_do2.Valor+"\n";
                     direccion = "JE";
                     break;
                 case "+=":

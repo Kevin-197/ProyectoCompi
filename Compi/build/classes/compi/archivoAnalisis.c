@@ -1,26 +1,20 @@
 
 int x;
-int x;
-int const a;
-int asdasd;
-const char c;
-long int t;
-short c; 
+const int c;
+int a;
 
 void funcion1(int x){
-    int aaaaa;
-    break;
-    continue;
-    while(a==a){
-        a=4>5;
-        if(x>=x){
-            4*ttt;
-            funcion4(xx);
-            funcion1();
+    c=0;
+    a=0;
+    while(c==a){
+        a=48;
+        x=4;
+        if(x==a){
+            4*x;
             break;
         }
         else{
-            funcion1(aaaaa);
+            x++;
             continue;
         }
         funcion1();
@@ -28,31 +22,19 @@ void funcion1(int x){
         funcion1(aaaaa);
         break;
     }
-    break;
-    switch (4)
-    {
-        case 0:
-            continue;
-        default:
-            break;
-    }
-    break;
-    if(x==x){
-        funcion4(xx);
-        funcion1();
+    a=48;
+    x=4;
+    if(x==a){
+        4*x;
+        break;
     }
     else{
-        funcion1(aaaaa);
+        x++;
+        continue;
     }
     funcion1();
-    
-    funcion1(aaaaa);
-}// fin de la funcion
 
-int funcion4(){
-    int aaaaaaaaaa=45;
-    funcion4();
-    funcion1();
-    funcion1(x);
+    funcion1(aaaaa);
+    break;
 }
 
